@@ -1,0 +1,24 @@
+{
+  "Project_Name": "OPENJPA",
+  "Categories": [
+    "Version",
+    "File",
+    "Name",
+    "LOC",
+    "LOC_touched",
+    "NR",
+    "NFix",
+    "NAuth",
+    "LOC_added",
+    "MAX_LOC_added",
+    "AVG_LOC_added",
+    "Churn",
+    "MAX_Churn",
+    "AVG_churn",
+    "ChgSetSize",
+    "MAX_ChgSet",
+    "Age",
+    "WeightedAge",
+    "Buggy"
+  ]
+}
