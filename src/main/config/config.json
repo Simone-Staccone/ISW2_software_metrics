@@ -1,5 +1,10 @@
 {
-  "Project_Name": "OPENJPA",
+  "Project_Names": [
+    "BOOKKEEPER",
+    "OPENJPA"
+  ],
+  "Output_File_Name_Tail": "Versions.csv",
+  "API-URL" : "https://issues.apache.org/jira/rest/api/2/project/",
   "Categories": [
     "Version",
     "File",
