@@ -1,4 +1,5 @@
 import org.json.JSONException;
+import utils.Initializer;
 
 import java.util.List;
 
@@ -9,5 +10,6 @@ public class Master {
         for(String project: projects) {
             JiraConnector.getInfos(project);
         }
+        GitHubConnector.getInfos();
     }
 }
