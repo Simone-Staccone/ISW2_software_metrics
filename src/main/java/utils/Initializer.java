@@ -1,3 +1,5 @@
+package utils;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -7,7 +9,9 @@ import java.util.*;
 
 
 public class Initializer {
-    private static String PROJECT_NAME = null;
+    private static List<String> PROJECT_NAMES = null;
+    private static String OUTPUT_FILE_NAME_TAIL = null;
+    private static String API_URL = null;
     private static List<String> CATEGORIES = null;
     private static Initializer instance = null;
 
@@ -21,12 +25,20 @@ public class Initializer {
         return instance;
     }
 
-    public static String getProjectName(){
-        return PROJECT_NAME;
+    public static List<String> getProjectNames(){
+        return PROJECT_NAMES;
     }
 
     public static List<String> getCategoriesNames(){
         return CATEGORIES;
+    }
+
+    public static String getApiUrl() {
+        return API_URL;
+    }
+
+    public static String getOutputFileNameTail() {
+        return OUTPUT_FILE_NAME_TAIL;
     }
 
     private void init() {
@@ -40,12 +52,15 @@ public class Initializer {
             String myJson = new Scanner(file).useDelimiter("\\Z").next();
             JSONObject config = new JSONObject(myJson);
             JSONArray names = config.names();
-            for(int i = 0;i<config.names().length();i++){
-                config.getString("Project_Name");
-                config.getJSONArray("Categories");
-            }
+
+            System.out.println(names);
+
             CATEGORIES = convertJSONArrayListString(config,names.getString(0));
-            PROJECT_NAME = config.getString(names.getString(1));
+            OUTPUT_FILE_NAME_TAIL = config.getString(names.getString(1));
+            PROJECT_NAMES = convertJSONArrayListString(config,names.getString(2));
+            API_URL = config.getString(names.getString(3));
+
+
         } catch (IOException e) {
             e.printStackTrace();
         }
