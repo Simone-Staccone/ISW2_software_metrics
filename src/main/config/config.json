@@ -1,7 +1,12 @@
 {
   "Project_Names": [
     "BOOKKEEPER",
-    "OPENJPA"
+    "AVRO",
+    "OPENJPA",
+    "STORM",
+    "ZOOKEEPER",
+    "SYNCOPE",
+    "TAJO"
   ],
   "Output_File_Name_Tail": "Versions.csv",
   "JIRA-API-URL" : "https://issues.apache.org/jira/rest/api/2/project/",

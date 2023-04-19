@@ -1,3 +1,6 @@
+package control;
+
+import model.Ticket;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import utils.IO;
@@ -16,21 +19,27 @@ public class JiraConnector {
 		JSONArray versions = resultSet.getJSONArray("versions");
 		JSONArray issues = secondResultSet.getJSONArray("issues");
 		List<Ticket> ticketList = new ArrayList<>();
-
+		int count = 0;
 
 		for(int i = 0; i < issues.length();i++){
 			JSONObject issue = issues.getJSONObject(i);
 			JSONObject fields = issue.getJSONObject("fields");
+			if(fields.getJSONArray("versions").length() != 0){  //We consider only the tickets with affected version
+				count++;
+			}
 			ticketList.add(
 					new Ticket(
 							fields.getJSONArray("versions").toString(),
 							fields.getJSONArray("fixVersions").toString(),
 							"",
-							fields.getJSONArray("versions").getJSONObject(0).getString("releaseDate"), //Check well if object existed in versions
+							"fields.getJSONArray('versions').getJSONObject(0).getString('releaseDate')", //Check well if object existed in versions
 							""
 					));
-			System.out.println(i + " " + ticketList.get(i).getAffectedVersionDate());
+
 		}
+		System.out.println("Issues with affected version: " + count);
+		System.out.println("Total issues: " + issues.length());
+		System.out.println("Percentage of issues with affected versions: " + Math.round( ( (float) count/ issues.length() ) * 10000.0) / 100.0 + "%");
 
 
 		for (int i = 0; i < versions.length(); i++ ) {
