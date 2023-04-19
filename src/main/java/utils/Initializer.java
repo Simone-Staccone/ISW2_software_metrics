@@ -63,13 +63,12 @@ public class Initializer {
             JSONObject config = new JSONObject(myJson);
             JSONArray names = config.names();
 
-
-            CATEGORIES = convertJSONArrayListString(config,names.getString(0));
-            OUTPUT_FILE_NAME_TAIL = config.getString(names.getString(1));
-            SEARCH_URL_SECOND_HALF = config.getString(names.getString(2));
-            SEARCH_URL_FIRST_HALF = config.getString(names.getString(3));
-            PROJECT_NAMES = convertJSONArrayListString(config,names.getString(4));
-            API_URL = config.getString(names.getString(5));
+            API_URL = config.getString(names.getString(0));
+            CATEGORIES = convertJSONArrayListString(config,names.getString(1));
+            OUTPUT_FILE_NAME_TAIL = config.getString(names.getString(2));
+            SEARCH_URL_SECOND_HALF = config.getString(names.getString(3));
+            SEARCH_URL_FIRST_HALF = config.getString(names.getString(4));
+            PROJECT_NAMES = convertJSONArrayListString(config,names.getString(5));
 
 
         } catch (IOException e) {

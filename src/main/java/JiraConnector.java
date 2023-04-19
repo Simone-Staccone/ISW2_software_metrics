@@ -3,6 +3,7 @@ import org.json.JSONObject;
 import utils.IO;
 import utils.Initializer;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,16 @@ public class JiraConnector {
 
 		for(int i = 0; i < issues.length();i++){
 			JSONObject issue = issues.getJSONObject(i);
-			ticketList.add(new Ticket(issue.getJSONObject("fields").toString()));
+			JSONObject fields = issue.getJSONObject("fields");
+			ticketList.add(
+					new Ticket(
+							fields.getJSONArray("versions").toString(),
+							fields.getJSONArray("fixVersions").toString(),
+							"",
+							fields.getJSONArray("versions").getJSONObject(0).getString("releaseDate"), //Check well if object existed in versions
+							""
+					));
+			System.out.println(i + " " + ticketList.get(i).getAffectedVersionDate());
 		}
 
 
