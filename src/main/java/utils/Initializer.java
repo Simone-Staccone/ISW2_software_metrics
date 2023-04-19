@@ -12,6 +12,8 @@ public class Initializer {
     private static List<String> PROJECT_NAMES = null;
     private static String OUTPUT_FILE_NAME_TAIL = null;
     private static String API_URL = null;
+    private static String SEARCH_URL_FIRST_HALF = null;
+    private static String SEARCH_URL_SECOND_HALF = null;
     private static List<String> CATEGORIES = null;
     private static Initializer instance = null;
 
@@ -41,6 +43,14 @@ public class Initializer {
         return OUTPUT_FILE_NAME_TAIL;
     }
 
+    public static String getSearchUrlFirstHalf() {
+        return SEARCH_URL_FIRST_HALF;
+    }
+
+    public static String getSearchUrlSecondHalf() {
+        return SEARCH_URL_SECOND_HALF;
+    }
+
     private void init() {
         String path = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "config" + File.separator + "config.json";
 
@@ -53,12 +63,13 @@ public class Initializer {
             JSONObject config = new JSONObject(myJson);
             JSONArray names = config.names();
 
-            System.out.println(names);
 
             CATEGORIES = convertJSONArrayListString(config,names.getString(0));
             OUTPUT_FILE_NAME_TAIL = config.getString(names.getString(1));
-            PROJECT_NAMES = convertJSONArrayListString(config,names.getString(2));
-            API_URL = config.getString(names.getString(3));
+            SEARCH_URL_SECOND_HALF = config.getString(names.getString(2));
+            SEARCH_URL_FIRST_HALF = config.getString(names.getString(3));
+            PROJECT_NAMES = convertJSONArrayListString(config,names.getString(4));
+            API_URL = config.getString(names.getString(5));
 
 
         } catch (IOException e) {
