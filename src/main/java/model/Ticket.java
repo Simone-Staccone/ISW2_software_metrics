@@ -1,53 +1,26 @@
 package model;
 
-public class Ticket {
-    private String affectedVersion = "";
-    private String fixedVersion = "";
-    private String component = "";
-    private String affectedVersionDate = "";
-    private String fixedVersionDate = "";
+public interface Ticket {
+    String fixedVersion = "";
+    String component = "";
+    String fixedVersionDate = "";
+    String releaseDate = "";
+    String openingVersion = "";
 
-    public Ticket(){
+    default String getReleaseDate() {
+        return releaseDate;
     }
-
-    public Ticket(String affectedVersion, String fixedVersion){
-        this.affectedVersion = affectedVersion;
-        this.fixedVersion = fixedVersion;
-    }
-
-    public Ticket(String affectedVersion, String fixedVersion,String component){
-        this.affectedVersion = affectedVersion;
-        this.fixedVersion = fixedVersion;
-        this.component = component;
-    }
-
-    public Ticket(String affectedVersion, String fixedVersion,String component, String affectedVersionDate, String fixedVersionDate){
-        this.affectedVersion = affectedVersion;
-        this.fixedVersion = fixedVersion;
-        this.component = component;
-        this.affectedVersionDate = affectedVersionDate;
-        this.fixedVersionDate = fixedVersionDate;
-    }
-
-
-
-    public String getAffectedVersion() {
-        return affectedVersion;
-    }
-
-    public String getFixedVersion() {
+    default String getFixedVersion() {
         return fixedVersion;
     }
-
-    public String getComponent() {
+    default String getComponent() {
         return component;
     }
-
-    public String getAffectedVersionDate() {
-        return affectedVersionDate;
-    }
-
-    public String getFixedVersionDate() {
+    default String getFixedVersionDate() {
         return fixedVersionDate;
     }
+    default String getOpeningVersion() {
+        return openingVersion;
+    }
+
 }

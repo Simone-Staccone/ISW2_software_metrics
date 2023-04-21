@@ -36,7 +36,9 @@ public class IO {
             String dir = "src" +  File.separator + "main" + File.separator + "data" + File.separator + projectName.toLowerCase() + File.separator;
             File directory = new File(dir);
             if(!directory.exists()){
-                boolean mkdir = directory.mkdir();
+                if(!directory.mkdir()){
+                    throw new IOException();
+                }
             }
             FileWriter fileWriter = new FileWriter(dir + projectName + Initializer.getOutputFileNameTail());
             fileWriter.append("Index;Version ID;Version Name;Date\n");
