@@ -1,11 +1,7 @@
 package model;
 
 public class ProportionTicket implements Ticket{
-    private String fixedVersion;
-    private String component;
-    private String affectedVersionDate;
-    private String fixedVersionDate;
-    private String openingVersion;
+    private final String openingVersion;
     private final float proportion;
 
     public ProportionTicket(String openingVersion){

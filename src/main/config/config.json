@@ -32,5 +32,6 @@
     "Age",
     "WeightedAge",
     "Buggy"
-  ]
+  ],
+  "LOG_FILE_NAME" : "log.txt"
 }

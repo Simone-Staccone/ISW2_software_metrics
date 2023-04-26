@@ -1,0 +1,95 @@
+STARTING SOFTWARE METRICS ANALYZER
+
+******************************************
+	  START ANALYZING BOOKKEEPER
+
+Issues with affected version: 170
+Issues used in proportion: 265
+Total issues: 435
+Percentage of issues with affected versions: 39.08%
+Percentage of issues used in proportion: 60.92%
+File for BOOKKEEPER project created correctly!
+
+	  FINISHED ANALYZING BOOKKEEPER
+******************************************
+
+******************************************
+	  START ANALYZING AVRO
+
+Issues with affected version: 313
+Issues used in proportion: 187
+Total issues: 500
+Percentage of issues with affected versions: 62.6%
+Percentage of issues used in proportion: 37.4%
+File for AVRO project created correctly!
+
+	  FINISHED ANALYZING AVRO
+******************************************
+
+******************************************
+	  START ANALYZING OPENJPA
+
+Issues with affected version: 456
+Issues used in proportion: 44
+Total issues: 500
+Percentage of issues with affected versions: 91.2%
+Percentage of issues used in proportion: 8.8%
+File for OPENJPA project created correctly!
+
+	  FINISHED ANALYZING OPENJPA
+******************************************
+
+******************************************
+	  START ANALYZING STORM
+
+Issues with affected version: 343
+Issues used in proportion: 157
+Total issues: 500
+Percentage of issues with affected versions: 68.6%
+Percentage of issues used in proportion: 31.4%
+File for STORM project created correctly!
+
+	  FINISHED ANALYZING STORM
+******************************************
+
+******************************************
+	  START ANALYZING ZOOKEEPER
+
+Issues with affected version: 353
+Issues used in proportion: 147
+Total issues: 500
+Percentage of issues with affected versions: 70.6%
+Percentage of issues used in proportion: 29.4%
+File for ZOOKEEPER project created correctly!
+
+	  FINISHED ANALYZING ZOOKEEPER
+******************************************
+
+******************************************
+	  START ANALYZING SYNCOPE
+
+Issues with affected version: 475
+Issues used in proportion: 25
+Total issues: 500
+Percentage of issues with affected versions: 95.0%
+Percentage of issues used in proportion: 5.0%
+File for SYNCOPE project created correctly!
+
+	  FINISHED ANALYZING SYNCOPE
+******************************************
+
+******************************************
+	  START ANALYZING TAJO
+
+Issues with affected version: 198
+Issues used in proportion: 302
+Total issues: 500
+Percentage of issues with affected versions: 39.6%
+Percentage of issues used in proportion: 60.4%
+File for TAJO project created correctly!
+
+	  FINISHED ANALYZING TAJO
+******************************************
+
+SOFTWARE METRICS ANALYZER SUCCESSFULLY STOPPED
+

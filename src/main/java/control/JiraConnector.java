@@ -52,18 +52,19 @@ public class JiraConnector {
 			throw new InvalidDataException();
 		}
 
-		System.out.println("Issues with affected version: " + countAffected);
-		System.out.println("Issues used in proportion: " + countProportion);
-		System.out.println("Total issues: " + issues.length());
-		System.out.println("Percentage of issues with affected versions: " + Math.round( ( (float) countAffected/ issues.length() ) * 10000.0) / 100.0 + "%");
-		System.out.println("Percentage of issues used in proportion: " + Math.round( ( (float) countProportion/ issues.length() ) * 10000.0) / 100.0 + "%");
+
+		IO.appendOnLog("Issues with affected version: " + countAffected);
+		IO.appendOnLog("Issues used in proportion: " + countProportion);
+		IO.appendOnLog("Total issues: " + issues.length());
+		IO.appendOnLog("Percentage of issues with affected versions: " + Math.round( ( (float) countAffected/ issues.length() ) * 10000.0) / 100.0 + "%");
+		IO.appendOnLog("Percentage of issues used in proportion: " + Math.round( ( (float) countProportion/ issues.length() ) * 10000.0) / 100.0 + "%");
 
 
 
 		if(IO.writeOnFile(projectName,entries)){
-			System.out.println("File for " + projectName +  " project created correctly!");
+			IO.appendOnLog("File for " + projectName +  " project created correctly!");
 		}else{
-			System.out.println("Error in writing on " + projectName + "project file!");
+			IO.appendOnLog("ERROR: Error in writing on " + projectName + "project file!");
 		}
 	}
 

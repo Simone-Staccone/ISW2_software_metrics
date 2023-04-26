@@ -57,4 +57,31 @@ public class IO {
             return false;
         }
     }
+
+    public static boolean appendOnLog(String whatToWrite){
+        try{
+            String dir = "src" +  File.separator + "main" + File.separator + "log.txt";
+            FileWriter fileWriter = new FileWriter(dir,true);
+            fileWriter.append(whatToWrite + "\n");
+            fileWriter.flush();
+            fileWriter.close();
+            return true;
+        } catch(IOException i){
+            i.printStackTrace();
+            return false;
+        }
+    }
+
+
+    public static void clean() {
+        try{
+            String dir = "src" +  File.separator + "main" + File.separator + "log.txt";
+            FileWriter fileWriter = new FileWriter(dir);
+            fileWriter.append("");
+            fileWriter.flush();
+            fileWriter.close();
+        } catch(IOException i){
+            i.printStackTrace();
+        }
+    }
 }
