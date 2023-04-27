@@ -1,10 +1,17 @@
 {
   "Project_Names": [
     "BOOKKEEPER",
-    "OPENJPA"
+    "AVRO",
+    "OPENJPA",
+    "STORM",
+    "ZOOKEEPER",
+    "SYNCOPE",
+    "TAJO"
   ],
   "Output_File_Name_Tail": "Versions.csv",
-  "API-URL" : "https://issues.apache.org/jira/rest/api/2/project/",
+  "JIRA-API-URL" : "https://issues.apache.org/jira/rest/api/2/project/",
+  "JIRA-SEARCH_URL_FIRST_HALF" : "https://issues.apache.org/jira/rest/api/2/search?jql=project=",
+  "JIRA-SEARCH_URL_SECOND_HALF" : "+and+type=bug+and+(status=closed+or+status=resolved)+and+resolution=fixed&maxResults=500",
   "Categories": [
     "Version",
     "File",
@@ -25,5 +32,6 @@
     "Age",
     "WeightedAge",
     "Buggy"
-  ]
+  ],
+  "LOG_FILE_NAME" : "log.txt"
 }

@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 
-
 public class IO {
     private static final String CSV_SEPARATOR = ";";
 
@@ -34,8 +33,14 @@ public class IO {
 
     public static boolean writeOnFile(String projectName, List<List<String>> entries){
         try{
-            FileWriter fileWriter;
-            fileWriter = new FileWriter(projectName + Initializer.getOutputFileNameTail());
+            String dir = "src" +  File.separator + "main" + File.separator + "data" + File.separator + projectName.toLowerCase() + File.separator;
+            File directory = new File(dir);
+            if(!directory.exists()){
+                if(!directory.mkdir()){
+                    throw new IOException();
+                }
+            }
+            FileWriter fileWriter = new FileWriter(dir + projectName + Initializer.getOutputFileNameTail());
             fileWriter.append("Index;Version ID;Version Name;Date\n");
             int index = 0;
 
@@ -47,9 +52,34 @@ public class IO {
             fileWriter.flush();
             fileWriter.close();
             return true;
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch(IOException i){
+            i.printStackTrace();
             return false;
+        }
+    }
+
+    public static void appendOnLog(String whatToWrite){
+        try{
+            String dir = "src" +  File.separator + "main" + File.separator + Initializer.getLogFileName();
+            FileWriter fileWriter = new FileWriter(dir,true);
+            fileWriter.append(whatToWrite).append("\n");
+            fileWriter.flush();
+            fileWriter.close();
+        } catch(IOException i){
+            i.printStackTrace();
+        }
+    }
+
+
+    public static void clean() {
+        try{
+            String dir = "src" +  File.separator + "main" + File.separator + "log.txt";
+            FileWriter fileWriter = new FileWriter(dir);
+            fileWriter.append("");
+            fileWriter.flush();
+            fileWriter.close();
+        } catch(IOException i){
+            i.printStackTrace();
         }
     }
 }
