@@ -9,7 +9,7 @@ import org.json.JSONArray;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Issue implements APIResult {
+public class Issue {
     public List<AffectedVersionTicket> affectedVersionTickets;
     public List<ProportionTicket> proportionTickets;
 
@@ -19,12 +19,11 @@ public class Issue implements APIResult {
         APIParser.computeState(issues,affectedVersionTickets,proportionTickets);
     }
 
-    @Override
     public List<AffectedVersionTicket> getAffectedVersionTickets() {
         return affectedVersionTickets;
     }
 
-    @Override
+
     public List<ProportionTicket> getProportionTickets() {
         return proportionTickets;
     }

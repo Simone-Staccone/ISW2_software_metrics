@@ -2,6 +2,7 @@ package control;
 
 import exceptions.InvalidDataException;
 import model.apiresult.Issue;
+import model.apiresult.TicketVersion;
 import model.ticket.AffectedVersionTicket;
 import model.ticket.ProportionTicket;
 import org.json.JSONArray;
@@ -27,12 +28,13 @@ public class JiraConnector {
 														+ Initializer.getSearchUrlSecondHalf()); //Get the JSON result from the url to see all the versions
 
 		JSONArray issues = Objects.requireNonNull(secondResultSet).getJSONArray("issues");
-		Issue apiResult = new Issue(issues);
-		List<AffectedVersionTicket> affectedVersionTickets = apiResult.getAffectedVersionTickets();
-		List<ProportionTicket> proportionTickets  = apiResult.getProportionTickets();
+		Issue apiResultIssues = new Issue(issues);
+		List<AffectedVersionTicket> affectedVersionTickets = apiResultIssues.getAffectedVersionTickets();
+		List<ProportionTicket> proportionTickets  = apiResultIssues.getProportionTickets();
 		int countAffected = affectedVersionTickets.size(), countProportion = proportionTickets.size();
 
 		List<List<String>> entries = getVersionInfo(Objects.requireNonNull(resultSet).getJSONArray("versions"));
+		TicketVersion apiResultVersion = new TicketVersion(entries);
 
 
 		IO.appendOnLog("Issues with affected version: " + countAffected);
@@ -40,7 +42,7 @@ public class JiraConnector {
 		IO.appendOnLog("Total issues: " + issues.length());
 		IO.appendOnLog("Percentage of issues with affected versions: " + Math.round( ( (float) countAffected/ issues.length() ) * 10000.0) / 100.0 + "%");
 		IO.appendOnLog("Percentage of issues used in proportion: " + Math.round( ( (float) countProportion/ issues.length() ) * 10000.0) / 100.0 + "%");
-
+		IO.appendOnLog("Number of releases: " + apiResultVersion);
 
 		if(IO.writeOnFile(projectName,entries)){
 			IO.appendOnLog("File for " + projectName +  " project created correctly!");

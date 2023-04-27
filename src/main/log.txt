@@ -8,6 +8,7 @@ Issues used in proportion: 170
 Total issues: 435
 Percentage of issues with affected versions: 60.92%
 Percentage of issues used in proportion: 39.08%
+Number of releases: model.apiresult.TicketVersion@54c562f7
 File for BOOKKEEPER project created correctly!
 
 	  FINISHED ANALYZING BOOKKEEPER
@@ -21,6 +22,7 @@ Issues used in proportion: 313
 Total issues: 500
 Percentage of issues with affected versions: 37.4%
 Percentage of issues used in proportion: 62.6%
+Number of releases: model.apiresult.TicketVersion@6dbb137d
 File for AVRO project created correctly!
 
 	  FINISHED ANALYZING AVRO
@@ -34,6 +36,7 @@ Issues used in proportion: 456
 Total issues: 500
 Percentage of issues with affected versions: 8.8%
 Percentage of issues used in proportion: 91.2%
+Number of releases: model.apiresult.TicketVersion@3c9d0b9d
 File for OPENJPA project created correctly!
 
 	  FINISHED ANALYZING OPENJPA
@@ -47,6 +50,7 @@ Issues used in proportion: 343
 Total issues: 500
 Percentage of issues with affected versions: 31.4%
 Percentage of issues used in proportion: 68.6%
+Number of releases: model.apiresult.TicketVersion@43301423
 File for STORM project created correctly!
 
 	  FINISHED ANALYZING STORM
@@ -60,6 +64,7 @@ Issues used in proportion: 353
 Total issues: 500
 Percentage of issues with affected versions: 29.4%
 Percentage of issues used in proportion: 70.6%
+Number of releases: model.apiresult.TicketVersion@2f112965
 File for ZOOKEEPER project created correctly!
 
 	  FINISHED ANALYZING ZOOKEEPER
@@ -73,6 +78,7 @@ Issues used in proportion: 475
 Total issues: 500
 Percentage of issues with affected versions: 5.0%
 Percentage of issues used in proportion: 95.0%
+Number of releases: model.apiresult.TicketVersion@1a04f701
 File for SYNCOPE project created correctly!
 
 	  FINISHED ANALYZING SYNCOPE
@@ -80,4 +86,17 @@ File for SYNCOPE project created correctly!
 
 ******************************************
 	  START ANALYZING TAJO
+
+Issues with affected version: 302
+Issues used in proportion: 198
+Total issues: 500
+Percentage of issues with affected versions: 60.4%
+Percentage of issues used in proportion: 39.6%
+Number of releases: model.apiresult.TicketVersion@4e91d63f
+File for TAJO project created correctly!
+
+	  FINISHED ANALYZING TAJO
+******************************************
+
+SOFTWARE METRICS ANALYZER SUCCESSFULLY STOPPED
 

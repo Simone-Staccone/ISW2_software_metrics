@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 public class APIParser {
+    private APIParser(){}
     /**
      * @param issues result set obtained by jira API
      * @param affectedVersionTickets list pf tickets with affected version reference in the result set
@@ -30,12 +31,13 @@ public class APIParser {
             List<String> fixedVersions = new ArrayList<>();
             List<Date> fixedVersionsDate = new ArrayList<>();
 
-
-            for (int j = 0; j < fields.getJSONArray("fixVersions").length(); j++) {
-                fixedVersions.add(fields.getJSONArray("fixVersions").getJSONObject(j).toString());
-                if(fields.getJSONArray("fixVersions").getJSONObject(j).has("releaseDate")){
+            for (int j = 0; j < fields.getJSONArray(ConstantNames.FIX_VERSIONS).length(); j++) {
+                fixedVersions.add(fields.getJSONArray(ConstantNames.FIX_VERSIONS).getJSONObject(j).toString());
+                if(fields.getJSONArray(ConstantNames.FIX_VERSIONS).getJSONObject(j).has(ConstantNames.RELEASE_DATE)){
                     try {
-                        fixedVersionsDate.add(new SimpleDateFormat("dd/MM/yyyy").parse(fields.getJSONArray("fixVersions").getJSONObject(j).getString("releaseDate")));
+                        fixedVersionsDate.add(
+                                new SimpleDateFormat(ConstantNames.RELEASE_DATE)
+                                        .parse(fields.getJSONArray(ConstantNames.RELEASE_DATE).getJSONObject(j).getString(ConstantNames.RELEASE_DATE)));
                     } catch (ParseException e) {
                         fixedVersions.add(null);
                     }
@@ -56,7 +58,10 @@ public class APIParser {
             } else {
                 proportionTickets.add(
                         new ProportionTicket(
-                                fields.getString("created")
+                                fixedVersions,
+                                fixedVersionsDate,
+                                components,
+                                openingVersion
                         ));
             }
         }
@@ -76,11 +81,9 @@ public class APIParser {
 
     private static Date getOpeningVersion(JSONObject fields) {
         Date openingVersion = null;
-        String formatString = "yyyy-MM-dd";
 
         try {
-            System.out.println(fields.getString("created").substring(0,formatString.length()));
-            openingVersion =  new SimpleDateFormat(formatString).parse(fields.getString("created").substring(0,formatString.length()));
+            openingVersion =  new SimpleDateFormat(ConstantNames.FORMATTING_STRING).parse(fields.getString(ConstantNames.CREATED).substring(0,ConstantNames.FORMATTING_STRING.length()));
         } catch (ParseException e) {
             IO.appendOnLog("ERROR: No opening version found");
         }
@@ -95,9 +98,9 @@ public class APIParser {
         if(versions.length() != 0) {
             id = Integer.parseInt(versions.getJSONObject(0).getString("id"));
             name = versions.getJSONObject(0).getString("name");
-            if(versions.getJSONObject(0).has("releaseDate")) {
+            if(versions.getJSONObject(0).has(ConstantNames.FORMATTING_STRING)) {
                 try {
-                    releaseDate = new SimpleDateFormat("yyyy-MM-dd").parse(versions.getJSONObject(0).getString("releaseDate"));
+                    releaseDate = new SimpleDateFormat(ConstantNames.FORMATTING_STRING).parse(versions.getJSONObject(0).getString(ConstantNames.RELEASE_DATE));
                 } catch (ParseException e) {
                     IO.appendOnLog("ERROR: release date wrongly formatted");
                     releaseDate = null;
