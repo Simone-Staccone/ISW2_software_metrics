@@ -52,6 +52,10 @@ public class Initializer {
         return SEARCH_URL_SECOND_HALF;
     }
 
+    public static String getLogFileName() {
+        return LOG_FILE_NAME;
+    }
+
     private void init() {
         String path = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "config" + File.separator + "config.json";
         IO.clean();

@@ -1,56 +1,38 @@
 package control;
 
 import exceptions.InvalidDataException;
-import model.AffectedVersionTicket;
-import model.ProportionTicket;
+import model.apiresult.Issue;
+import model.ticket.AffectedVersionTicket;
+import model.ticket.ProportionTicket;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import utils.IO;
 import utils.Initializer;
 
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 public class JiraConnector {
+	/**
+	 * @param projectName The name of the project we are considering, taken from config file
+	 * @throws InvalidDataException Exception thrown when the number of the tickets generated from the script doesn't match
+	 * the total number of tickets given by the api
+	 */
 	public void getInfos(String projectName) throws InvalidDataException {
-		JSONObject resultSet = IO.readJsonFromUrl(Initializer.getApiUrl() + projectName);
-		JSONObject secondResultSet = IO.readJsonFromUrl(Initializer.getSearchUrlFirstHalf() + projectName + Initializer.getSearchUrlSecondHalf());
-		JSONArray issues = secondResultSet.getJSONArray("issues");
-		List<AffectedVersionTicket> affectedVersionTickets = new ArrayList<>();
-		List<ProportionTicket> proportionTickets  = new ArrayList<>();
-		int countAffected = 0, countProportion = 0;
-		List<List<String>> entries = getVersionInfo(resultSet.getJSONArray("versions"));
+		JSONObject resultSet = IO.readJsonFromUrl(Initializer.getApiUrl() + projectName); //Get the JSON result from the url to see all the issues
+		JSONObject secondResultSet = IO.readJsonFromUrl(Initializer.getSearchUrlFirstHalf()
+														+ projectName
+														+ Initializer.getSearchUrlSecondHalf()); //Get the JSON result from the url to see all the versions
 
+		JSONArray issues = Objects.requireNonNull(secondResultSet).getJSONArray("issues");
+		Issue apiResult = new Issue(issues);
+		List<AffectedVersionTicket> affectedVersionTickets = apiResult.getAffectedVersionTickets();
+		List<ProportionTicket> proportionTickets  = apiResult.getProportionTickets();
+		int countAffected = affectedVersionTickets.size(), countProportion = proportionTickets.size();
 
-		for(int i = 0; i < issues.length();i++){
-			JSONObject issue = issues.getJSONObject(i);
-			JSONObject fields = issue.getJSONObject("fields");
-			if(fields.getJSONArray("versions").length() != 0){  //We consider only the tickets with affected version
-				countAffected++;
-				affectedVersionTickets.add(
-						new AffectedVersionTicket(
-								fields.getJSONArray("versions").toString(),
-								fields.getJSONArray("fixVersions").toString(),
-								"",
-								"fields.getJSONArray('versions').getJSONObject(0).getString('releaseDate')", //Check well if object existed in versions
-								"",
-								"entries.get(0).get(2)"
-						));
-			}else{
-				countProportion++;
-				proportionTickets.add(
-						new ProportionTicket(
-								fields.getString("created")
-						));
-			}
-
-		}
-
-		if(countAffected+countProportion != issues.length()){
-			throw new InvalidDataException();
-		}
+		List<List<String>> entries = getVersionInfo(Objects.requireNonNull(resultSet).getJSONArray("versions"));
 
 
 		IO.appendOnLog("Issues with affected version: " + countAffected);
@@ -58,7 +40,6 @@ public class JiraConnector {
 		IO.appendOnLog("Total issues: " + issues.length());
 		IO.appendOnLog("Percentage of issues with affected versions: " + Math.round( ( (float) countAffected/ issues.length() ) * 10000.0) / 100.0 + "%");
 		IO.appendOnLog("Percentage of issues used in proportion: " + Math.round( ( (float) countProportion/ issues.length() ) * 10000.0) / 100.0 + "%");
-
 
 
 		if(IO.writeOnFile(projectName,entries)){
@@ -71,7 +52,7 @@ public class JiraConnector {
 	private static List<List<String>> getVersionInfo(JSONArray versions){
 		List<List<String>> entries = new ArrayList<>();
 		for (int i = 0; i < versions.length(); i++ ) {
-			List<String> entry = new ArrayList();
+			List<String> entry = new ArrayList<>();
 			if(versions.getJSONObject(i).has("releaseDate") && versions.getJSONObject(i).has("name") && versions.getJSONObject(i).has("id")) {
 				entry.add(versions.getJSONObject(i).get("id").toString());
 				entry.add(versions.getJSONObject(i).get("name").toString());

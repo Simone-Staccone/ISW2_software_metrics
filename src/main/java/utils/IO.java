@@ -58,17 +58,15 @@ public class IO {
         }
     }
 
-    public static boolean appendOnLog(String whatToWrite){
+    public static void appendOnLog(String whatToWrite){
         try{
-            String dir = "src" +  File.separator + "main" + File.separator + "log.txt";
+            String dir = "src" +  File.separator + "main" + File.separator + Initializer.getLogFileName();
             FileWriter fileWriter = new FileWriter(dir,true);
-            fileWriter.append(whatToWrite + "\n");
+            fileWriter.append(whatToWrite).append("\n");
             fileWriter.flush();
             fileWriter.close();
-            return true;
         } catch(IOException i){
             i.printStackTrace();
-            return false;
         }
     }
 

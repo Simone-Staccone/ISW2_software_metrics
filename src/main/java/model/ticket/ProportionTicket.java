@@ -1,6 +1,6 @@
-package model;
+package model.ticket;
 
-public class ProportionTicket implements Ticket{
+public class ProportionTicket implements Ticket {
     private final String openingVersion;
     private final float proportion;
 
