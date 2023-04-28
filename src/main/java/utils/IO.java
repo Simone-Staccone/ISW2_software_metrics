@@ -1,5 +1,6 @@
 package utils;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -11,11 +12,23 @@ import java.util.List;
 public class IO {
     private static final String CSV_SEPARATOR = ";";
 
-    public static JSONObject readJsonFromUrl(String url)  {
+    public static JSONObject readJsonObject(String url)  {
         try (InputStream is = new URL(url).openStream()) {
             BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
             String jsonText = readAll(rd);
             return new JSONObject(jsonText);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    public static JSONArray readJsonArray(String url)  {
+        try (InputStream is = new URL(url).openStream()) {
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+            String jsonText = readAll(rd);
+            return new JSONArray(jsonText);
         } catch (IOException e) {
             e.printStackTrace();
         }

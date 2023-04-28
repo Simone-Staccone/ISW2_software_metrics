@@ -22,8 +22,8 @@ public class JiraConnector {
 	 * the total number of tickets given by the api
 	 */
 	public void getInfos(String projectName) throws InvalidDataException {
-		JSONObject resultSet = IO.readJsonFromUrl(Initializer.getApiUrl() + projectName); //Get the JSON result from the url to see all the issues
-		JSONObject secondResultSet = IO.readJsonFromUrl(Initializer.getSearchUrlFirstHalf()
+		JSONObject resultSet = IO.readJsonObject(Initializer.getApiUrl() + projectName); //Get the JSON result from the url to see all the issues
+		JSONObject secondResultSet = IO.readJsonObject(Initializer.getSearchUrlFirstHalf()
 														+ projectName
 														+ Initializer.getSearchUrlSecondHalf()); //Get the JSON result from the url to see all the versions
 
