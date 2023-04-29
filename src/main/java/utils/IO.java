@@ -7,6 +7,7 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Set;
 
 
 public class IO {
@@ -87,6 +88,28 @@ public class IO {
     public static void clean() {
         try{
             String dir = "src" +  File.separator + "main" + File.separator + "log.txt";
+            FileWriter fileWriter = new FileWriter(dir);
+            fileWriter.append("");
+            fileWriter.flush();
+            fileWriter.close();
+        } catch(IOException i){
+            i.printStackTrace();
+        }
+    }
+
+    public static void appendOnFile(String dir, String className) {
+        try{
+            FileWriter fileWriter = new FileWriter(dir,true);
+            fileWriter.append(className).append("\n");
+            fileWriter.flush();
+            fileWriter.close();
+        } catch(IOException i){
+            i.printStackTrace();
+        }
+    }
+
+    public static void clean(String dir) {
+        try{
             FileWriter fileWriter = new FileWriter(dir);
             fileWriter.append("");
             fileWriter.flush();

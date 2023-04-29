@@ -8,5 +8,103 @@ Issues used in proportion: 170
 Total issues: 435
 Percentage of issues with affected versions: 60.92%
 Percentage of issues used in proportion: 39.08%
-Number of releases: model.apiresult.TicketVersion@54c562f7
+Number of releases: model.apiresult.TicketVersion@bef2d72
 File for BOOKKEEPER project created correctly!
+Starting getting commits for project: bookkeeper
+Obtained commits for project: bookkeeper ...
+Computing project classes for project: bookkeeper
+Obtained project classes for project: bookkeeper
+
+	  FINISHED ANALYZING BOOKKEEPER
+******************************************
+
+******************************************
+	  START ANALYZING AVRO
+
+Issues with affected version: 187
+Issues used in proportion: 313
+Total issues: 500
+Percentage of issues with affected versions: 37.4%
+Percentage of issues used in proportion: 62.6%
+Number of releases: model.apiresult.TicketVersion@306f16f3
+File for AVRO project created correctly!
+
+	  FINISHED ANALYZING AVRO
+******************************************
+
+******************************************
+	  START ANALYZING OPENJPA
+
+Issues with affected version: 44
+Issues used in proportion: 456
+Total issues: 500
+Percentage of issues with affected versions: 8.8%
+Percentage of issues used in proportion: 91.2%
+Number of releases: model.apiresult.TicketVersion@702b8b12
+File for OPENJPA project created correctly!
+Starting getting commits for project: openjpa
+Obtained commits for project: openjpa ...
+Computing project classes for project: openjpa
+Obtained project classes for project: openjpa
+
+	  FINISHED ANALYZING OPENJPA
+******************************************
+
+******************************************
+	  START ANALYZING STORM
+
+Issues with affected version: 157
+Issues used in proportion: 343
+Total issues: 500
+Percentage of issues with affected versions: 31.4%
+Percentage of issues used in proportion: 68.6%
+Number of releases: model.apiresult.TicketVersion@5f9b2141
+File for STORM project created correctly!
+
+	  FINISHED ANALYZING STORM
+******************************************
+
+******************************************
+	  START ANALYZING ZOOKEEPER
+
+Issues with affected version: 147
+Issues used in proportion: 353
+Total issues: 500
+Percentage of issues with affected versions: 29.4%
+Percentage of issues used in proportion: 70.6%
+Number of releases: model.apiresult.TicketVersion@247d8ae
+File for ZOOKEEPER project created correctly!
+
+	  FINISHED ANALYZING ZOOKEEPER
+******************************************
+
+******************************************
+	  START ANALYZING SYNCOPE
+
+Issues with affected version: 25
+Issues used in proportion: 475
+Total issues: 500
+Percentage of issues with affected versions: 5.0%
+Percentage of issues used in proportion: 95.0%
+Number of releases: model.apiresult.TicketVersion@48974e45
+File for SYNCOPE project created correctly!
+
+	  FINISHED ANALYZING SYNCOPE
+******************************************
+
+******************************************
+	  START ANALYZING TAJO
+
+Issues with affected version: 302
+Issues used in proportion: 198
+Total issues: 500
+Percentage of issues with affected versions: 60.4%
+Percentage of issues used in proportion: 39.6%
+Number of releases: model.apiresult.TicketVersion@6a84a97d
+File for TAJO project created correctly!
+
+	  FINISHED ANALYZING TAJO
+******************************************
+
+SOFTWARE METRICS ANALYZER SUCCESSFULLY STOPPED
+
