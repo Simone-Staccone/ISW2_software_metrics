@@ -10,7 +10,7 @@ public class ProjectClass {
     private List<Commit> commits;    //These are the commits of the specified release that have modified the class
     private boolean isBuggy;
 
-    private int size;
+    private int loc;
     private int nr;
     private int nAuth;
     private int locAdded;
@@ -23,16 +23,21 @@ public class ProjectClass {
     private List<Integer> addedLinesList;
     private List<Integer> deletedLinesList;
 
-    public ProjectClass(String name, String content, Release release) {
+    public ProjectClass(String name,
+                        String content,
+                        Release release,
+                        int loc,
+                        int nAuth
+                        ) {
         this.name = name;
         this.content = content;
         this.release = release;
         this.commits = new ArrayList<>();
         this.isBuggy = false;
+        this.loc = loc;
+        this.nAuth = nAuth;
 
-        this.size = 0;
         this.nr = 0;
-        this.nAuth = 0;
         this.locAdded = 0;
         this.maxLocAdded = 0;
         this.avgLocAdded = 0;
@@ -118,15 +123,15 @@ public class ProjectClass {
     /**
      * @return the size
      */
-    public int getSize() {
-        return size;
+    public int getLoc() {
+        return loc;
     }
 
     /**
-     * @param size the size to set
+     * @param loc the size to set
      */
-    public void setSize(int size) {
-        this.size = size;
+    public void setLoc(int loc) {
+        this.loc = loc;
     }
 
     /**

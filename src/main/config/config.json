@@ -14,8 +14,7 @@
   "JIRA-SEARCH_URL_SECOND_HALF" : "+and+type=bug+and+(status=closed+or+status=resolved)+and+resolution=fixed&maxResults=500",
   "Categories": [
     "Version",
-    "File",
-    "Name",
+    "File Name",
     "LOC",
     "LOC_touched",
     "NR",

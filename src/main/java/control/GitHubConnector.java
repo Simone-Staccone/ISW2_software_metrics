@@ -1,6 +1,8 @@
 package control;
 
 
+import model.ProjectClass;
+import model.Release;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Constants;
@@ -12,27 +14,22 @@ import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import utils.IO;
+import utils.Initializer;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GitHubConnector {
-
     private GitHubConnector() throws IllegalAccessException {
         throw new IllegalAccessException("Can't initialize this class");
     }
 
-    public static List<RevCommit> getCommits(String project) throws IOException, GitAPIException {
+    private static List<RevCommit> getCommits(String project) throws IOException, GitAPIException {
         List<RevCommit> revCommits = new ArrayList<>();
         RepositoryBuilder repositoryBuilder = new RepositoryBuilder();
-
-        String url = "C:\\Users\\simon\\ISW2Projects\\Falessi\\src\\main\\data\\" + project.toLowerCase() + File.separator + "data.csv";
-
+        String url = "C:\\Users\\simon\\ISW2Projects\\Falessi\\src\\main\\data\\" + project.toLowerCase() + File.separator + "dataSet.csv";
 
         Repository repo = repositoryBuilder
                 .findGitDir(new File("C:\\Users\\simon\\ISW2Projects\\projects\\" + project.toLowerCase() + File.separator))
@@ -54,14 +51,16 @@ public class GitHubConnector {
             }
         }
         IO.clean(url);
-        //System.out.println(classesNames);
+
 
         IO.appendOnLog("Obtained commits for project: " + project.toLowerCase() +  " ...");
 
         return revCommits;
     }
 
-    public static List<String> getProjectClassesNames(String project) throws IOException {
+
+
+    private static Map<String, String> getProjectClassesText(String project) throws IOException {
         RepositoryBuilder repositoryBuilder = new RepositoryBuilder();
         Repository repository = repositoryBuilder
                 .findGitDir(new File("C:\\Users\\simon\\ISW2Projects\\projects\\" + project.toLowerCase() + File.separator))
@@ -76,8 +75,6 @@ public class GitHubConnector {
             RevCommit commit = revWalk.parseCommit(lastCommitId);
             // and using commit's tree find the path
             RevTree tree = commit.getTree();
-            System.out.println("Having tree: " + tree);
-
             // now try to find a specific file
             try (TreeWalk treeWalk = new TreeWalk(repository)) {
                 treeWalk.addTree(tree);
@@ -95,12 +92,55 @@ public class GitHubConnector {
             revWalk.dispose();
         }
 
-        List<String> projectClassesNames = new ArrayList<>(projectClassesText.keySet());
-        String url = "C:\\Users\\simon\\ISW2Projects\\Falessi\\src\\main\\data\\" + project.toLowerCase() + File.separator + "data.csv";
 
-        for(String name:projectClassesNames){
-            IO.appendOnFile(url,name);
+        return projectClassesText;
+    }
+
+
+    public static void buildDataSet(String project) throws IOException, GitAPIException {
+        List<ProjectClass> projectClasses = new ArrayList<>();
+        Map<String, String> projectClassesText = getProjectClassesText(project);
+        List<String> projectClassesTexts = new ArrayList<>();
+        List<RevCommit> commits = getCommits(project);
+        List<String> projectClassesNames = new ArrayList<>(projectClassesText.keySet());
+        List<Integer> LOC = new ArrayList<>();
+        ComputeMetrics computer = new ComputeMetrics();
+        List<Integer> nAuthors = new ArrayList<>();
+
+
+        for(String javaClass : projectClassesText.values()) {
+            String[] lines = javaClass.split("\r\n|\r|\n");
+            projectClassesTexts.add(javaClass);
+            LOC.add(computer.computeLOC(lines));
+            nAuthors.add(computer.computeNAuth(javaClass,commits));
         }
-        return projectClassesNames;
+
+        for(int i=0;i<LOC.size();i++){
+            projectClasses.add(
+                    new ProjectClass(
+                            projectClassesNames.get(i),
+                            projectClassesTexts.get(i),
+                            new Release(0,"",new Date()),
+                            LOC.get(i),
+                            nAuthors.get(i)
+                            ));
+        }
+        String url = "C:\\Users\\simon\\ISW2Projects\\Falessi\\src\\main\\data\\" + project.toLowerCase() + File.separator + "dataSet.csv";
+
+        IO.clean(url);
+
+        IO.appendOnFile(url, Initializer.getCategoriesNames().toString());
+        for(ProjectClass projectClass:projectClasses){
+            IO.appendOnFile(url,
+                    "1," +
+                            projectClass.getName() +
+                            "," +
+                            projectClass.getLoc() +
+                            "," +
+                            "," +
+                            "," +
+                            projectClass.getnAuth());
+        }
+
     }
 }
