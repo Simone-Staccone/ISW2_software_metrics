@@ -41,7 +41,7 @@ public class GitHubConnector {
         IO.appendOnLog("Starting getting commits for project: " + project.toLowerCase());
 
 
-        Iterable<RevCommit> commitsList = git.log().call();
+        Iterable<RevCommit> commitsList = git.log().call(); //Only get commit in present branch
 
 
 

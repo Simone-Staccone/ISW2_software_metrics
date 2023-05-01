@@ -9,9 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TicketVersion{
-    List<Release> releases = new ArrayList<>();
+    public List<Release> releases;
 
     public TicketVersion(List<List<String>> entries){
+        releases = new ArrayList<>();
         for(List<String> entry : entries){
             try {
                 releases.add(

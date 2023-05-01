@@ -1,6 +1,7 @@
 package control;
 
 import exceptions.InvalidDataException;
+import model.Release;
 import model.ticket.AffectedVersionTicket;
 import model.ticket.ProportionTicket;
 import model.verions.AffectedVersion;
@@ -20,29 +21,16 @@ public class APIParser {
      * @param issues result set obtained by jira API
      * @param affectedVersionTickets list pf tickets with affected version reference in the result set
      * @param proportionTickets list of tickets without affected version, to use to compute proportion
+     * @param releases
      * @throws InvalidDataException Exception raised when the total number of tickets doesn't match the sum of the split
      */
-    public static void computeState(JSONArray issues, List<AffectedVersionTicket> affectedVersionTickets,  List<ProportionTicket> proportionTickets) throws InvalidDataException {
+    public static void computeState(JSONArray issues, List<AffectedVersionTicket> affectedVersionTickets, List<ProportionTicket> proportionTickets, List<Release> releases) throws InvalidDataException, ParseException {
         for (int i = 0; i < issues.length(); i++) {
             JSONObject fields = issues.getJSONObject(i).getJSONObject("fields");
             Date openingVersion = getOpeningVersion(fields);
             List<String> components = getComponents(fields.getJSONArray("components"));
             AffectedVersion affectedVersion = getAffectedVersion(fields.getJSONArray("versions"));
-            List<String> fixedVersions = new ArrayList<>();
-            List<Date> fixedVersionsDate = new ArrayList<>();
-
-            for (int j = 0; j < fields.getJSONArray(ConstantNames.FIX_VERSIONS).length(); j++) {
-                fixedVersions.add(fields.getJSONArray(ConstantNames.FIX_VERSIONS).getJSONObject(j).toString());
-                if(fields.getJSONArray(ConstantNames.FIX_VERSIONS).getJSONObject(j).has(ConstantNames.RELEASE_DATE)){
-                    try {
-                        fixedVersionsDate.add(
-                                new SimpleDateFormat(ConstantNames.RELEASE_DATE)
-                                        .parse(fields.getJSONArray(ConstantNames.RELEASE_DATE).getJSONObject(j).getString(ConstantNames.RELEASE_DATE)));
-                    } catch (ParseException e) {
-                        fixedVersions.add(null);
-                    }
-                }
-            }
+            Date fixedVersion = getFixedVersion(fields.getString("resolutiondate"),releases);
 
 
 
@@ -50,16 +38,13 @@ public class APIParser {
                 affectedVersionTickets.add(
                         new AffectedVersionTicket(
                                 affectedVersion,
-                                fixedVersions,
-                                fixedVersionsDate,
                                 components,
-                                openingVersion
+                                openingVersion,
+                                fixedVersion
                         ));
             } else {
                 proportionTickets.add(
                         new ProportionTicket(
-                                fixedVersions,
-                                fixedVersionsDate,
                                 components,
                                 openingVersion
                         ));
@@ -69,6 +54,19 @@ public class APIParser {
         if (affectedVersionTickets.size() + proportionTickets.size() != issues.length()) {
             throw new InvalidDataException();
         }
+    }
+
+    private static Date getFixedVersion(String fixDate, List<Release> dates) throws ParseException {
+        //Compute Fixed version as the following release of the date of fix
+        Date fixedVersion = new Date();
+
+        for (Release release:dates) {
+            if(new SimpleDateFormat(ConstantNames.FORMATTING_STRING).parse(fixDate).after(release.getReleaseDate())){
+                fixedVersion = new SimpleDateFormat(ConstantNames.FORMATTING_STRING).parse(fixDate);
+                break;
+            }
+        }
+        return fixedVersion;
     }
 
     private static List<String> getComponents(JSONArray components) {

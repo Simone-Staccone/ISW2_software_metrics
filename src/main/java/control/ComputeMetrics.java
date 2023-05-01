@@ -26,9 +26,11 @@ public class ComputeMetrics {
         List<String> classAuthors = new ArrayList<>();
 
         for(RevCommit commit : commits) {
-            if(!classAuthors.contains(commit.getAuthorIdent().getName())) {
+            //System.out.println(commit.getAuthorIdent().getName() + " " + commit.getAuthorIdent().getWhen());
+            break;
+            /*if(!classAuthors.contains(commit.getAuthorIdent().getName())) {
                 classAuthors.add(commit.getAuthorIdent().getName());
-            }
+            }*/
         }
         System.out.println(classAuthors);
 

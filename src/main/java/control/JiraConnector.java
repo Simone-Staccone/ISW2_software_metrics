@@ -20,21 +20,26 @@ public class JiraConnector {
 	 * @param projectName The name of the project we are considering, taken from config file
 	 * @throws InvalidDataException Exception thrown when the number of the tickets generated from the script doesn't match
 	 * the total number of tickets given by the api
+	 * @return
 	 */
-	public void getInfos(String projectName) throws InvalidDataException {
+	public TicketVersion getInfos(String projectName) throws InvalidDataException {
 		JSONObject resultSet = IO.readJsonObject(Initializer.getApiUrl() + projectName); //Get the JSON result from the url to see all the issues
+		List<List<String>> entries = getVersionInfo(Objects.requireNonNull(resultSet).getJSONArray("versions"));
+		TicketVersion apiResultVersion = new TicketVersion(entries);
+
+
+
 		JSONObject secondResultSet = IO.readJsonObject(Initializer.getSearchUrlFirstHalf()
 														+ projectName
 														+ Initializer.getSearchUrlSecondHalf()); //Get the JSON result from the url to see all the versions
 
 		JSONArray issues = Objects.requireNonNull(secondResultSet).getJSONArray("issues");
-		Issue apiResultIssues = new Issue(issues);
+		Issue apiResultIssues = new Issue(issues,apiResultVersion.releases);
 		List<AffectedVersionTicket> affectedVersionTickets = apiResultIssues.getAffectedVersionTickets();
 		List<ProportionTicket> proportionTickets  = apiResultIssues.getProportionTickets();
 		int countAffected = affectedVersionTickets.size(), countProportion = proportionTickets.size();
 
-		List<List<String>> entries = getVersionInfo(Objects.requireNonNull(resultSet).getJSONArray("versions"));
-		TicketVersion apiResultVersion = new TicketVersion(entries);
+
 
 
 		IO.appendOnLog("Issues with affected version: " + countAffected);
@@ -49,6 +54,7 @@ public class JiraConnector {
 		}else{
 			IO.appendOnLog("ERROR: Error in writing on " + projectName + "project file!");
 		}
+		return apiResultVersion;
 	}
 
 	private static List<List<String>> getVersionInfo(JSONArray versions){

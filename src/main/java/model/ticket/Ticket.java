@@ -8,15 +8,11 @@ import java.util.List;
 public interface Ticket {
     String openingVersion = "";
     List<String> components = new ArrayList<>();
-    List<String> fixedVersion = new ArrayList<>();
-    List<Date> fixedVersionDate = new ArrayList<>();
+    Date fixedVersion = new Date();
     AffectedVersion affectedVersion = null;
 
-    default List<String> getFixedVersion() {
+    default Date getFixedVersion() {
         return fixedVersion;
-    }
-    default List<Date> getFixedVersionDate() {
-        return fixedVersionDate;
     }
     default String getOpeningVersion() {
         return openingVersion;

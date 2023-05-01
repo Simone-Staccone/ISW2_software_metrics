@@ -1,6 +1,8 @@
 import control.GitHubConnector;
 import control.JiraConnector;
 import exceptions.InvalidDataException;
+import model.Release;
+import model.apiresult.TicketVersion;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.json.JSONException;
 import utils.IO;
@@ -18,11 +20,14 @@ public class Master {
         JiraConnector jiraConnector = new JiraConnector();
         List<String> projects = Initializer.getProjectNames();
 
+
+
         for (String project : projects) {
             IO.appendOnLog("******************************************");
             IO.appendOnLog("\t  START ANALYZING " + project + "\n");
             try {
-                jiraConnector.getInfos(project);
+                List<Release> releases = jiraConnector.getInfos(project).releases;
+
             } catch (InvalidDataException e) {
                 IO.appendOnLog("ERROR: Error in data split");
             }
