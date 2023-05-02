@@ -9,19 +9,18 @@ import java.util.Objects;
 public record AffectedVersionTicket(AffectedVersion affectedVersion,
                                     List<String> components,
                                     Date openingVersion,
-                                    Date fixedVersion) implements Ticket {
+                                    Date fixedVersion) {
 
-    @Override
     public AffectedVersion getAffectedVersion() {
         return affectedVersion;
     }
 
-    @Override
+
     public List<String> getComponents() {
         return components;
     }
 
-    @Override
+
     public Date getFixedVersion() {
         return fixedVersion;
     }

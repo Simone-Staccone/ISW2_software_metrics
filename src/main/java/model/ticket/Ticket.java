@@ -1,22 +1,34 @@
 package model.ticket;
 
-import model.verions.AffectedVersion;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
-public interface Ticket {
-    String openingVersion = "";
-    List<String> components = new ArrayList<>();
-    Date fixedVersion = new Date();
-    AffectedVersion affectedVersion = null;
+public class Ticket {
+    private Date openingVersionDate;
+    private Date fixedVersionDate;
+    private Date injectedVersionDate;
 
-    default Date getFixedVersion() {
-        return fixedVersion;
+    public Ticket(Date openingVersionDate,Date fixedVersionDate){
+        this.openingVersionDate = openingVersionDate;
+        this.fixedVersionDate = fixedVersionDate;
     }
-    default String getOpeningVersion() {
-        return openingVersion;
+
+
+    public Ticket(Date openingVersionDate,Date fixedVersionDate,Date injectedVersionDate){
+        this.openingVersionDate = openingVersionDate;
+        this.fixedVersionDate = fixedVersionDate;
+        this.injectedVersionDate = injectedVersionDate;
     }
-    default List<String> getComponents(){return components;}
-    default AffectedVersion getAffectedVersion(){return affectedVersion;}
+
+
+    public Date getOpeningVersionDate() {
+        return openingVersionDate;
+    }
+
+    public Date getFixedVersionDate() {
+        return fixedVersionDate;
+    }
+
+    public Date getInjectedVersionDate() {
+        return injectedVersionDate;
+    }
 }

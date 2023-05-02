@@ -32,7 +32,7 @@ public class ComputeMetrics {
                 classAuthors.add(commit.getAuthorIdent().getName());
             }*/
         }
-        System.out.println(classAuthors);
+        //System.out.println(classAuthors);
 
 
         return classAuthors.size();

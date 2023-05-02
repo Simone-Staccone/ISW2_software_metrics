@@ -11,7 +11,7 @@
   "Output_File_Name_Tail": "Versions.csv",
   "JIRA-API-URL" : "https://issues.apache.org/jira/rest/api/2/project/",
   "JIRA-SEARCH_URL_FIRST_HALF" : "https://issues.apache.org/jira/rest/api/2/search?jql=project=",
-  "JIRA-SEARCH_URL_SECOND_HALF" : "+and+type=bug+and+(status=closed+or+status=resolved)+and+resolution=fixed&maxResults=500",
+  "JIRA-SEARCH_URL_SECOND_HALF" : "+and+type=bug+and+(status=closed+or+status=resolved)+and+resolution=fixed&maxResults=1000",
   "Categories": [
     "Version",
     "File Name",

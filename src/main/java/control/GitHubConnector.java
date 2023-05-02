@@ -13,12 +13,15 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import utils.IO;
 import utils.Initializer;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.util.*;
 
 public class GitHubConnector {
@@ -26,19 +29,22 @@ public class GitHubConnector {
         throw new IllegalAccessException("Can't initialize this class");
     }
 
-    private static List<RevCommit> getCommits(String project) throws IOException, GitAPIException {
+    public static List<RevCommit> getCommits(String project) throws IOException, GitAPIException {
         List<RevCommit> revCommits = new ArrayList<>();
         RepositoryBuilder repositoryBuilder = new RepositoryBuilder();
         String url = "C:\\Users\\simon\\ISW2Projects\\Falessi\\src\\main\\data\\" + project.toLowerCase() + File.separator + "dataSet.csv";
+
+        //Logger logger = LoggerFactory.getLogger("log.txt"); Why does the warning still olds????
 
         Repository repo = repositoryBuilder
                 .findGitDir(new File("C:\\Users\\simon\\ISW2Projects\\projects\\" + project.toLowerCase() + File.separator))
                 .setMustExist(true)
                 .build();
+
         Git git = new Git(repo);
 
 
-        IO.appendOnLog("Starting getting commits for project: " + project.toLowerCase());
+        IO.appendOnLog("Starting getting commits for project: " + project.toLowerCase() + "...");
 
 
         Iterable<RevCommit> commitsList = git.log().call(); //Only get commit in present branch
@@ -53,7 +59,7 @@ public class GitHubConnector {
         IO.clean(url);
 
 
-        IO.appendOnLog("Obtained commits for project: " + project.toLowerCase() +  " ...");
+        IO.appendOnLog("Obtained commits for project: " + project.toLowerCase());
 
         return revCommits;
     }
@@ -97,11 +103,10 @@ public class GitHubConnector {
     }
 
 
-    public static void buildDataSet(String project) throws IOException, GitAPIException {
+    public static void buildDataSet(String project, List<RevCommit> commits) throws IOException, GitAPIException {
         List<ProjectClass> projectClasses = new ArrayList<>();
         Map<String, String> projectClassesText = getProjectClassesText(project);
         List<String> projectClassesTexts = new ArrayList<>();
-        List<RevCommit> commits = getCommits(project);
         List<String> projectClassesNames = new ArrayList<>(projectClassesText.keySet());
         List<Integer> LOC = new ArrayList<>();
         ComputeMetrics computer = new ComputeMetrics();
@@ -120,7 +125,7 @@ public class GitHubConnector {
                     new ProjectClass(
                             projectClassesNames.get(i),
                             projectClassesTexts.get(i),
-                            new Release(0,"",new Date()),
+                           new Release(0,"",new Date(),commits.get(0)),
                             LOC.get(i),
                             nAuthors.get(i)
                             ));
@@ -142,5 +147,18 @@ public class GitHubConnector {
                             projectClass.getnAuth());
         }
 
+    }
+
+    //Error computing this
+    public static RevCommit getCommitOfRelease(List<RevCommit> commits, Date releaseDate) throws ParseException {
+        Date lastDate = commits.get(commits.size()-1).getAuthorIdent().getWhen();
+        RevCommit lastCommit = commits.get(0);
+        for (RevCommit commit : commits) {
+            if (commit.getAuthorIdent().getWhen().before(releaseDate) && commit.getAuthorIdent().getWhen().after(lastDate)) {
+                lastDate = commit.getAuthorIdent().getWhen();
+                lastCommit = commit;
+            }
+        }
+       return lastCommit;
     }
 }

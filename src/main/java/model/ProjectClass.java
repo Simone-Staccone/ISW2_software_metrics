@@ -32,7 +32,6 @@ public class ProjectClass {
         this.name = name;
         this.content = content;
         this.release = release;
-        this.commits = new ArrayList<>();
         this.isBuggy = false;
         this.loc = loc;
         this.nAuth = nAuth;
