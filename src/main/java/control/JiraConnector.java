@@ -1,7 +1,6 @@
 package control;
 
 import exceptions.InvalidDataException;
-import model.Release;
 import model.Releases;
 import model.apiresult.Issue;
 import model.apiresult.TicketVersion;
@@ -85,12 +84,13 @@ public class JiraConnector {
 
 
 		for (String project : projects) {
-			List<AffectedVersionTicket> allAVTickets = new ArrayList<>();
+			List<Ticket> allAVTickets = new ArrayList<>();
 			if (!Objects.equals(project, "BOOKKEEPER") && !Objects.equals(project, "OPENJPA")) {
 				Releases versions = getInfos(project);
-				List<AffectedVersionTicket> affectedVersionTickets = JiraConnector.getTicketsWithAv(project,versions);
-				if (affectedVersionTickets != null) {
-					allAVTickets = Stream.concat(allAVTickets.stream(), affectedVersionTickets.stream())
+				List<Ticket> ticketList = null;
+				ticketList = JiraConnector.getTicketsWithAv(project,versions);
+				if (ticketList != null) {
+					allAVTickets = Stream.concat(allAVTickets.stream(), ticketList.stream())
 							.distinct()
 							.collect(Collectors.toList());
 				}
@@ -108,26 +108,37 @@ public class JiraConnector {
 		return new Releases(getVersionInfo(Objects.requireNonNull(resultSet).getJSONArray("versions")));
 	}
 
-	private static List<AffectedVersionTicket> getTicketsWithAv(String project, Releases versions) {
-		List<AffectedVersionTicket> affectedVersionTickets = null;
+	private static List<Ticket> getTicketsWithAv(String project, Releases versions){
 		JSONObject secondResultSet = IO.readJsonObject(Initializer.getSearchUrlFirstHalf()
 				+ project
 				+ Initializer.getSearchUrlSecondHalf()); //Get the JSON result from the url to see all the issues
-
+		List<Ticket> ticketList = new ArrayList<>();
 
 		for (int i = 0;i<secondResultSet.getJSONArray("issues").length();i++) {
 			JSONObject fields = secondResultSet.getJSONArray("issues").getJSONObject(i).getJSONObject("fields");
-			List<Ticket> ticketList = new ArrayList<>();
+
 			if(fields.getJSONArray("versions").length() != 0){ //Check only tickets with injected version
 				Date openingVersionDate = DateParser.parseStringToDate(fields.getString("created").substring(0,ConstantNames.FORMATTING_STRING.length())); //While parsing I intentionally lose information about hour and minutes of the ticket
 				Date fixedVersionDate = DateParser.parseStringToDate(fields.getString("resolutiondate").substring(0,ConstantNames.FORMATTING_STRING.length()));
 				JSONArray injectedVersions = fields.getJSONArray("versions");
-				if(openingVersionDate.before(versions.getLatestRelease().getReleaseDate()) && fixedVersionDate.before(versions.getLatestRelease().getReleaseDate())) //Add only if fixedversion and opening version are both located before last release with a date
-					ticketList.add(Proportion.createTicket(openingVersionDate,fixedVersionDate,injectedVersions,versions.getReleaseList()));
+
+				if(openingVersionDate.before(versions.getLatestRelease().getReleaseDate()) //Add only if fixed version and opening version are both located before last release with a date
+						&& fixedVersionDate.before(versions.getLatestRelease().getReleaseDate())
+						&& openingVersionDate.before(fixedVersionDate)){ //Don't consider tickets with wrong dates
+					try {
+						ticketList.add(Proportion.createTicket(openingVersionDate,fixedVersionDate,injectedVersions,versions.getReleaseList()));
+					} catch (InvalidDataException e) {
+					}
+				}
 			}
 		}
 
+		System.out.println(project + " " + ticketList.size());
 
-		return affectedVersionTickets;
+		//		for (Ticket ticket:ticketList){
+//			System.out.println(ticket.getFixedVersionDate() + " " +  ticket.getInjectedVersionDate() + " " + ticket.getOpeningVersionDate());
+//		}
+
+		return ticketList;
 	}
 }

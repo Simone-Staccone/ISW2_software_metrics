@@ -1,3 +1,6 @@
 STARTING SOFTWARE METRICS ANALYZER
 
 Computing proportion with cold start ...
+Proportion successfully acquired
+SOFTWARE METRICS ANALYZER SUCCESSFULLY STOPPED
+
