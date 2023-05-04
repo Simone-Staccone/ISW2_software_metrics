@@ -22,8 +22,8 @@ public class TicketVersion{
                                 Integer.parseInt(entry.get(0)),
                                 entry.get(1),
                                 new SimpleDateFormat(ConstantNames.FORMATTING_STRING).parse(entry.get(2)),
-                                GitHubConnector.getCommitOfRelease(commits,new SimpleDateFormat(ConstantNames.FORMATTING_STRING).parse(entry.get(2)))
-                        )
+                                GitHubConnector.getCommitOfRelease(commits,new SimpleDateFormat(ConstantNames.FORMATTING_STRING).parse(entry.get(2))),
+                                entry.indexOf(entry) + 1)
                 );
             } catch (ParseException e) {
                 releases.add(
@@ -31,8 +31,8 @@ public class TicketVersion{
                                 Integer.parseInt(entry.get(0)),
                                 entry.get(1),
                                 null,
-                                null
-                        )
+                                null,
+                                entry.indexOf(entry) + 1)
                 );
             }
         }
@@ -47,8 +47,8 @@ public class TicketVersion{
                                 Integer.parseInt(entry.get(0)),
                                 entry.get(1),
                                 new SimpleDateFormat(ConstantNames.FORMATTING_STRING).parse(entry.get(2)),
-                                null
-                        )
+                                null,
+                                entry.indexOf(entry) + 1)
                 );
             } catch (ParseException e) {
                 releases.add(
@@ -56,8 +56,8 @@ public class TicketVersion{
                                 Integer.parseInt(entry.get(0)),
                                 entry.get(1),
                                 null,
-                                null
-                        )
+                                null,
+                                entry.indexOf(entry) + 1)
                 );
             }
         }

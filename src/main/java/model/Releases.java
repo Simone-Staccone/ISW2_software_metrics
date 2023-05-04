@@ -16,7 +16,8 @@ public class Releases {
             Release release = new Release(Integer.parseInt(entry.get(0)),
                     entry.get(1),
                     DateParser.parseStringToDate(entry.get(2)),
-                    null);
+                    null,
+                    Integer.parseInt(entry.get(3)) + 1);
             releaseList.add(release);
             if(latestReleaseDate.before(release.getReleaseDate())){
                 latestRelease = release;

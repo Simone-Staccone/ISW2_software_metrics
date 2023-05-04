@@ -15,13 +15,39 @@ public class Proportion {
 
     //We need to compute proportion using both cold start and increment (Need to get IV for historical data)
 
-    public static long coldStart(List<Ticket> ticketList, Releases releases){
-        long propSum = 0;
+    public static float coldStart(List<Ticket> ticketList, Releases releases){
+        float propSum = 0;
         for (Ticket ticket: ticketList){
-            //System.out.println(affectedVersionTicket.openingVersion() + " " + affectedVersionTicket.getAffectedVersion().getReleaseDate());
+            propSum = propSum + compute(ticket,releases);
         }
 
-        return 0L;
+
+
+        return propSum/ (float) ticketList.size();
+    }
+
+    private static float compute(Ticket ticket, Releases releases) {
+        int OV = 1;
+        int FV = 1;
+        int IV = 1;
+
+        for(Release release:releases.getReleaseList()){
+            if(ticket.getInjectedVersionDate().compareTo(release.getReleaseDate()) == 0){
+                IV = release.getReleaseNumber();
+            }
+            if(ticket.getFixedVersionDate().compareTo(release.getReleaseDate()) == 0){
+                FV = release.getReleaseNumber();
+            }
+            if(ticket.getOpeningVersionDate().compareTo(release.getReleaseDate()) == 0){
+                OV = release.getReleaseNumber();
+            }
+        }
+
+//        System.out.println(ticket.getFixedVersionDate() + " " + ticket.getInjectedVersionDate() + " " + ticket.getOpeningVersionDate());
+//        System.out.println(FV + " " + IV + " " + OV);
+//        System.out.println((float) (FV-IV+1)/(FV-OV+1) );
+        return (float) (FV-IV+1)/ (float) (FV-OV+1); //Smoothing per considerare la distanza tra la stessa versione pari a 1 e quindi poter applicare porportion
+
     }
 
     public static Ticket createTicket(Date openingVersionDate, Date fixedVersionDate, JSONArray injectedVersion, List<Release> versions) throws InvalidDataException {
@@ -49,7 +75,12 @@ public class Proportion {
             IVDate = versions.get(versions.size()-1).getReleaseDate();
         }
 
-        if(IVDate == null || OV.after(FV) || IVDate.after(OV) || IVDate.after(FV)){ //Don't consider FV==OV to apply smoothing
+
+        if(FV.compareTo(fixedVersionDate) == 0){
+            FV = versions.get(0).getReleaseDate();
+        }
+//|| FV.compareTo(OV) == 0
+        if(IVDate == null || OV.after(FV) || IVDate.after(OV) || IVDate.after(FV) ){ //Don't consider FV==OV to apply smoothing
             throw new InvalidDataException();
         }
         return new Ticket(OV,FV,IVDate,IV);

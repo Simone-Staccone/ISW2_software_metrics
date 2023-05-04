@@ -13,8 +13,6 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import utils.IO;
 import utils.Initializer;
 
@@ -125,7 +123,7 @@ public class GitHubConnector {
                     new ProjectClass(
                             projectClassesNames.get(i),
                             projectClassesTexts.get(i),
-                           new Release(0,"",new Date(),commits.get(0)),
+                           new Release(0,"",new Date(),commits.get(0),  1),
                             LOC.get(i),
                             nAuthors.get(i)
                             ));

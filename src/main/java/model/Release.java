@@ -4,7 +4,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.util.Date;
 
-public record Release(int id, String name, Date releaseDate, RevCommit commit) {
+public record Release(int id, String name, Date releaseDate, RevCommit commit, int releaseNumber) {
 
     public int getId() {
         return id;
@@ -21,4 +21,6 @@ public record Release(int id, String name, Date releaseDate, RevCommit commit) {
     public RevCommit getLastCommit(){ //Each release has a unique commit associated which is the last commit before the release
         return commit;
     }
+
+    public int getReleaseNumber(){return releaseNumber;}
 }

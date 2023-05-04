@@ -9,6 +9,7 @@ public class Ticket {
     private final String releaseName;
 
 
+
     public Ticket(Date openingVersionDate, Date fixedVersionDate, Date injectedVersionDate, String releaseName) {
         this.openingVersionDate = openingVersionDate;
         this.fixedVersionDate = fixedVersionDate;

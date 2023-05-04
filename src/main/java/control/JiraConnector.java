@@ -72,19 +72,22 @@ public class JiraConnector {
 				entry.add(versions.getJSONObject(i).get("id").toString());
 				entry.add(versions.getJSONObject(i).get("name").toString());
 				entry.add(versions.getJSONObject(i).get("releaseDate").toString());
+				entry.add(String.valueOf(i));
 				entries.add(entry);
 			}
 		}
 		return entries;
 	}
 
-	public long computeProportion(List<String> projects) {
-		List<Long> proportions = new ArrayList<>();
+	public float computeProportion(List<String> projects) {
+		List<Float> proportions = new ArrayList<>();
+		float prop = 0;
 		IO.appendOnLog("Computing proportion with cold start ...");
 
-
+		int i = 0;
 		for (String project : projects) {
 			List<Ticket> allAVTickets = new ArrayList<>();
+			float singleProportion;
 			if (!Objects.equals(project, "BOOKKEEPER") && !Objects.equals(project, "OPENJPA")) {
 				Releases versions = getInfos(project);
 				List<Ticket> ticketList = null;
@@ -94,13 +97,21 @@ public class JiraConnector {
 							.distinct()
 							.collect(Collectors.toList());
 				}
-				Proportion.coldStart(allAVTickets, versions); //Compute proportion for each project
+				singleProportion = Proportion.coldStart(allAVTickets, versions); //Compute proportion for each project
+				prop = prop + singleProportion;
+				proportions.add(singleProportion);
+
+				IO.appendOnLog("Proportion calculated for project " + project + " is: " + proportions.get(i) + " number of tickets: " + ticketList.size());
+				i++;
 			}
+
 		}
 
 
+
+		IO.appendOnLog("Proportion value computed with cold start is: " + prop / proportions.size());
 		IO.appendOnLog("Proportion successfully acquired");
-		return proportions.size();
+		return prop / proportions.size();
 	}
 
 	private Releases getInfos(String projectName) {
@@ -135,9 +146,6 @@ public class JiraConnector {
 
 		System.out.println(project + " " + ticketList.size());
 
-		//		for (Ticket ticket:ticketList){
-//			System.out.println(ticket.getFixedVersionDate() + " " +  ticket.getInjectedVersionDate() + " " + ticket.getOpeningVersionDate());
-//		}
 
 		return ticketList;
 	}
