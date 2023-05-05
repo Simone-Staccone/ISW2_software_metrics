@@ -1,12 +1,13 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class ProjectClass {
     private String name;
-    private String content;
-    private Release release;
+    private Collection<String> content;
+    private int release;
     private List<Commit> commits;    //These are the commits of the specified release that have modified the class
     private boolean isBuggy;
 
@@ -23,17 +24,12 @@ public class ProjectClass {
     private List<Integer> addedLinesList;
     private List<Integer> deletedLinesList;
 
-    public ProjectClass(String name,
-                        String content,
-                        Release release,
-                        int loc,
-                        int nAuth
-                        ) {
+    public ProjectClass(int release,String name, Collection<String> content, int LOC) {
         this.name = name;
         this.content = content;
         this.release = release;
         this.isBuggy = false;
-        this.loc = loc;
+        this.loc = LOC;
         this.nAuth = nAuth;
 
         this.nr = 0;
@@ -66,28 +62,28 @@ public class ProjectClass {
     /**
      * @return the content
      */
-    public String getContent() {
+    public Collection<String> getContent() {
         return content;
     }
 
     /**
      * @param content the content to set
      */
-    public void setContent(String content) {
+    public void setContent(Collection<String> content) {
         this.content = content;
     }
 
     /**
      * @return the release
      */
-    public Release getRelease() {
+    public int getRelease() {
         return release;
     }
 
     /**
      * @param release the release to set
      */
-    public void setRelease(Release release) {
+    public void setRelease(int release) {
         this.release = release;
     }
 

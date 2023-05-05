@@ -19,6 +19,7 @@ public class Releases {
                     null,
                     Integer.parseInt(entry.get(3)) + 1);
             releaseList.add(release);
+            assert latestReleaseDate != null;
             if(latestReleaseDate.before(release.getReleaseDate())){
                 latestRelease = release;
                 latestReleaseDate = release.getReleaseDate();

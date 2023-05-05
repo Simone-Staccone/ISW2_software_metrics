@@ -1,23 +1,57 @@
 STARTING SOFTWARE METRICS ANALYZER
 
-Computing proportion with cold start ...
-Proportion calculated for project AVRO is: 1.1107533 number of tickets: 407
-Proportion calculated for project STORM is: 2.5200658 number of tickets: 166
-Proportion calculated for project ZOOKEEPER is: 1.7228062 number of tickets: 477
-Proportion calculated for project SYNCOPE is: 1.2640756 number of tickets: 286
-Proportion calculated for project TAJO is: 1.298913 number of tickets: 46
-Proportion value computed with cold start is: 1.5833228
-Proportion successfully acquired
+******************************************
+	  START ANALYZING BOOKKEEPER
+
+Starting getting commits for project: bookkeeper...
+Obtained commits for project: bookkeeper
+
+	  FINISHED ANALYZING BOOKKEEPER
+******************************************
+
+******************************************
+	  START ANALYZING AVRO
+
+
+	  FINISHED ANALYZING AVRO
+******************************************
+
+******************************************
+	  START ANALYZING OPENJPA
+
+Starting getting commits for project: openjpa...
+Obtained commits for project: openjpa
+
+	  FINISHED ANALYZING OPENJPA
+******************************************
+
+******************************************
+	  START ANALYZING STORM
+
+
+	  FINISHED ANALYZING STORM
+******************************************
+
+******************************************
+	  START ANALYZING ZOOKEEPER
+
+
+	  FINISHED ANALYZING ZOOKEEPER
+******************************************
+
+******************************************
+	  START ANALYZING SYNCOPE
+
+
+	  FINISHED ANALYZING SYNCOPE
+******************************************
+
+******************************************
+	  START ANALYZING TAJO
+
+
+	  FINISHED ANALYZING TAJO
+******************************************
+
 SOFTWARE METRICS ANALYZER SUCCESSFULLY STOPPED
 
-STARTING SOFTWARE METRICS ANALYZER
-
-Computing proportion with cold start ...
-Proportion calculated for project AVRO is: 1.2409483 number of tickets: 404
-Proportion calculated for project STORM is: 3.426473 number of tickets: 166
-Proportion calculated for project ZOOKEEPER is: 2.332464 number of tickets: 477
-Proportion calculated for project SYNCOPE is: 1.5390532 number of tickets: 282
-Proportion calculated for project TAJO is: 1.442761 number of tickets: 45
-Proportion value computed with cold start is: 1.9963398
-Proportion successfully acquired
-SOFTWARE METRICS ANALYZER SUCCESSFULLY STOPPED

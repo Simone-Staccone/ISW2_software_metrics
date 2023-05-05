@@ -1,4 +1,4 @@
-package model.verions;
+package model;
 
 import java.util.Date;
 
@@ -10,9 +10,5 @@ public record AffectedVersion(int id, String name, Date releaseDate){
 
     public String getName() {
         return name;
-    }
-
-    public Date getReleaseDate() {
-        return releaseDate;
     }
 }

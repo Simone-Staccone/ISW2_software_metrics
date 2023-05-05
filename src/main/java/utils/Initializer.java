@@ -28,7 +28,7 @@ public class Initializer {
         return instance;
     }
 
-    public static List<String> getProjectNames(){
+    public List<String> getProjectNames(){
         return PROJECT_NAMES;
     }
 

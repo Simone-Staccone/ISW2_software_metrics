@@ -1,20 +1,17 @@
 package control;
 
 
-import model.ProjectClass;
-import model.Release;
+import model.Releases;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.Constants;
-import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
-import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import utils.IO;
-import utils.Initializer;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,12 +24,10 @@ public class GitHubConnector {
         throw new IllegalAccessException("Can't initialize this class");
     }
 
-    public static List<RevCommit> getCommits(String project) throws IOException, GitAPIException {
+    public static List<RevCommit> getCommits(String project,Releases releases) throws IOException, GitAPIException {
         List<RevCommit> revCommits = new ArrayList<>();
         RepositoryBuilder repositoryBuilder = new RepositoryBuilder();
         String url = "C:\\Users\\simon\\ISW2Projects\\Falessi\\src\\main\\data\\" + project.toLowerCase() + File.separator + "dataSet.csv";
-
-        //Logger logger = LoggerFactory.getLogger("log.txt"); Why does the warning still olds????
 
         Repository repo = repositoryBuilder
                 .findGitDir(new File("C:\\Users\\simon\\ISW2Projects\\projects\\" + project.toLowerCase() + File.separator))
@@ -45,15 +40,45 @@ public class GitHubConnector {
         IO.appendOnLog("Starting getting commits for project: " + project.toLowerCase() + "...");
 
 
-        Iterable<RevCommit> commitsList = git.log().call(); //Only get commit in present branch
+        List<Ref> branchesList = git.branchList().setListMode(ListBranchCommand.ListMode.ALL).call();
 
 
+        //Branches loop
+        for(Ref branch : branchesList) {
+            Iterable<RevCommit> commitsList = git.log().add(repo.resolve(branch.getName())).call(); //Only get commit in present branch
 
-        for (RevCommit commit : commitsList) {
-            if (!revCommits.contains(commit)) {
-                revCommits.add(commit);
+            for(RevCommit commit : commitsList) {
+                if(!revCommits.contains(commit)) {
+                    revCommits.add(commit);
+
+
+                    if (commit.getAuthorIdent().getWhen().before(releases.getReleaseList().get(0).getReleaseDate())) {
+                        releases.getReleaseList().get(0).addCommit(commit);
+                        if(releases.getReleaseList().get(0).getLastCommit() == null){
+                            releases.getReleaseList().get(0).setLastCommit(commit);
+                        }
+                        if (commit.getAuthorIdent().getWhen().before(releases.getReleaseList().get(0).getLastCommit().getAuthorIdent().getWhen())) {
+                            releases.getReleaseList().get(0).setLastCommit(commit);
+                        }
+                    } else {
+                        for (int i = 1; i < releases.getReleaseList().size(); i++) {
+                            if(releases.getReleaseList().get(i).getLastCommit() == null){
+                                releases.getReleaseList().get(i).setLastCommit(commit);
+                            }
+
+                            if (commit.getAuthorIdent().getWhen().before(releases.getReleaseList().get(i).getReleaseDate())
+                                    && commit.getAuthorIdent().getWhen().after(releases.getReleaseList().get(i - 1).getReleaseDate())) {
+                                releases.getReleaseList().get(i).addCommit(commit);
+                                if (commit.getAuthorIdent().getWhen().before(releases.getReleaseList().get(i).getLastCommit().getAuthorIdent().getWhen())) {
+                                    releases.getReleaseList().get(i).setLastCommit(commit);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
+
         IO.clean(url);
 
 
@@ -62,46 +87,36 @@ public class GitHubConnector {
         return revCommits;
     }
 
-
-
-    private static Map<String, String> getProjectClassesText(String project) throws IOException {
+    public static Map<String, String> getClassesForCommit(RevCommit commit, String project) throws IOException {
         RepositoryBuilder repositoryBuilder = new RepositoryBuilder();
         Repository repository = repositoryBuilder
                 .findGitDir(new File("C:\\Users\\simon\\ISW2Projects\\projects\\" + project.toLowerCase() + File.separator))
                 .setMustExist(true)
                 .build();
-        Map<String, String> projectClassesText = new HashMap<>();
-        // find the HEAD
-        ObjectId lastCommitId = repository.resolve(Constants.HEAD);
+        Map<String, String> javaClasses = new HashMap<>();
 
-        // a RevWalk allows to walk over commits based on some filtering that is defined
-        try (RevWalk revWalk = new RevWalk(repository)) {
-            RevCommit commit = revWalk.parseCommit(lastCommitId);
-            // and using commit's tree find the path
-            RevTree tree = commit.getTree();
-            // now try to find a specific file
-            try (TreeWalk treeWalk = new TreeWalk(repository)) {
-                treeWalk.addTree(tree);
-                treeWalk.setRecursive(true);
-                while(treeWalk.next()) {
-                    //We are keeping only Java classes that are not involved in tests
-                    if(treeWalk.getPathString().contains(".java") && !treeWalk.getPathString().contains("/test/")) {
-                        //We are retrieving (name class, content class) couples
-                        projectClassesText.put(treeWalk.getPathString(), new String(repository.open(treeWalk.getObjectId(0)).getBytes(), StandardCharsets.UTF_8));
-                    }
-                }
+        RevTree tree = commit.getTree();	//We get the tree of the files and the directories that were belonging to the repository when commit was pushed
+        TreeWalk treeWalk = new TreeWalk(repository);	//We use a TreeWalk to iterate over all files in the Tree recursively
+        treeWalk.addTree(tree);
+        treeWalk.setRecursive(true);
 
+        while(treeWalk.next()) {
+            //We are keeping only Java classes that are not involved in tests
+            if(treeWalk.getPathString().contains(".java") && !treeWalk.getPathString().contains("/test/")) {
+                //We are retrieving (name class, content class) couples
+                javaClasses.put(treeWalk.getPathString(), new String(repository.open(treeWalk.getObjectId(0)).getBytes(), StandardCharsets.UTF_8));
             }
-
-            revWalk.dispose();
         }
+        treeWalk.close();
 
+        return javaClasses;
 
-        return projectClassesText;
     }
 
 
-    public static void buildDataSet(String project, List<RevCommit> commits) throws IOException, GitAPIException {
+
+    /*
+    public static void buildDataSet(String project, List<RevCommit> commits) throws IOException {
         List<ProjectClass> projectClasses = new ArrayList<>();
         Map<String, String> projectClassesText = getProjectClassesText(project);
         List<String> projectClassesTexts = new ArrayList<>();
@@ -145,7 +160,7 @@ public class GitHubConnector {
                             projectClass.getnAuth());
         }
 
-    }
+    }*/
 
     //Error computing this
     public static RevCommit getCommitOfRelease(List<RevCommit> commits, Date releaseDate) throws ParseException {

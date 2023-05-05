@@ -1,10 +1,8 @@
 package control;
 
 import exceptions.InvalidDataException;
+import model.AffectedVersion;
 import model.Release;
-import model.ticket.AffectedVersionTicket;
-import model.ticket.ProportionTicket;
-import model.verions.AffectedVersion;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import utils.IO;
@@ -17,13 +15,8 @@ import java.util.List;
 
 public class APIParser {
     private APIParser(){}
-    /**
-     * @param issues result set obtained by jira API
-     * @param affectedVersionTickets list pf tickets with affected version reference in the result set
-     * @param proportionTickets list of tickets without affected version, to use to compute proportion
-     * @param releases
-     * @throws InvalidDataException Exception raised when the total number of tickets doesn't match the sum of the split
-     */
+
+    /*
     public static void computeState(JSONArray issues, List<AffectedVersionTicket> affectedVersionTickets, List<ProportionTicket> proportionTickets, List<Release> releases) throws InvalidDataException, ParseException {
         for (int i = 0; i < issues.length(); i++) {
             JSONObject fields = issues.getJSONObject(i).getJSONObject("fields");
@@ -54,7 +47,7 @@ public class APIParser {
         if (affectedVersionTickets.size() + proportionTickets.size() != issues.length()) {
             throw new InvalidDataException();
         }
-    }
+    }*/
 
     private static Date getFixedVersion(String fixDate, List<Release> dates) throws ParseException {
         //Compute Fixed version as the following release of the date of fix

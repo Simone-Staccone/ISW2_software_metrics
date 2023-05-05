@@ -10,7 +10,7 @@ public class ComputeMetrics {
 
     }
 
-    public int computeLOC(String[] lines){
+    public static int computeLOC(String[] lines){
         int count = 0;
 
         for(String s :lines){
