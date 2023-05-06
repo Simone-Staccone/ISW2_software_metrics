@@ -8,8 +8,5 @@
     </CLASSES>
     <JAVADOC />
     <SOURCES />
-    <excluded>
-      <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.30/slf4j-api-1.7.30.jar!/" />
-    </excluded>
   </library>
 </component>

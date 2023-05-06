@@ -10,47 +10,12 @@ Obtained commits for project: bookkeeper
 ******************************************
 
 ******************************************
-	  START ANALYZING AVRO
-
-
-	  FINISHED ANALYZING AVRO
-******************************************
-
-******************************************
 	  START ANALYZING OPENJPA
 
 Starting getting commits for project: openjpa...
 Obtained commits for project: openjpa
 
 	  FINISHED ANALYZING OPENJPA
-******************************************
-
-******************************************
-	  START ANALYZING STORM
-
-
-	  FINISHED ANALYZING STORM
-******************************************
-
-******************************************
-	  START ANALYZING ZOOKEEPER
-
-
-	  FINISHED ANALYZING ZOOKEEPER
-******************************************
-
-******************************************
-	  START ANALYZING SYNCOPE
-
-
-	  FINISHED ANALYZING SYNCOPE
-******************************************
-
-******************************************
-	  START ANALYZING TAJO
-
-
-	  FINISHED ANALYZING TAJO
 ******************************************
 
 SOFTWARE METRICS ANALYZER SUCCESSFULLY STOPPED

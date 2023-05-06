@@ -39,7 +39,7 @@ public class Proportion {
                 OV = release.getReleaseNumber();
             }
         }
-        return (float) (FV-IV+1)/ (float) (FV-OV+1); //Smoothing to consider the same version as distance one and therefore consider also tickets when IV = OV
+        return (float) (FV-IV)/ (float) (FV-OV); //Smoothing to consider the same version as distance one and therefore consider also tickets when IV = OV
 
     }
 
@@ -73,7 +73,7 @@ public class Proportion {
             FV = versions.get(0).getReleaseDate();
         }
 
-        if(IVDate == null || OV.after(FV) || IVDate.after(OV) || IVDate.after(FV) ){ //Don't consider FV==OV to apply smoothing
+        if(IVDate == null || OV.after(FV) || IVDate.after(OV) || IVDate.after(FV) || OV.compareTo(FV) == 0){ //Don't consider FV==OV to apply smoothing
             throw new InvalidDataException();
         }
         return new Ticket(OV,FV,IVDate,IV,key);

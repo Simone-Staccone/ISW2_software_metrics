@@ -1,14 +1,16 @@
 package model;
 
+import control.ComputeMetrics;
+import org.eclipse.jgit.revwalk.RevCommit;
+
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class ProjectClass {
     private String name;
-    private Collection<String> content;
+    private String content;
     private int release;
-    private List<Commit> commits;    //These are the commits of the specified release that have modified the class
+    private List<RevCommit> commits;    //These are the commits of the specified release that have modified the class
     private boolean isBuggy;
 
     private int loc;
@@ -24,13 +26,13 @@ public class ProjectClass {
     private List<Integer> addedLinesList;
     private List<Integer> deletedLinesList;
 
-    public ProjectClass(int release,String name, Collection<String> content, int LOC) {
+    public ProjectClass(int release, String name, String content) {
         this.name = name;
         this.content = content;
         this.release = release;
         this.isBuggy = false;
-        this.loc = LOC;
-        this.nAuth = nAuth;
+        this.loc = ComputeMetrics.computeLOC(content);
+        this.nAuth = 0;
 
         this.nr = 0;
         this.locAdded = 0;
@@ -62,14 +64,14 @@ public class ProjectClass {
     /**
      * @return the content
      */
-    public Collection<String> getContent() {
+    public String getContent() {
         return content;
     }
 
     /**
      * @param content the content to set
      */
-    public void setContent(Collection<String> content) {
+    public void setContent(String content) {
         this.content = content;
     }
 
@@ -90,14 +92,14 @@ public class ProjectClass {
     /**
      * @return the commits
      */
-    public List<Commit> getCommits() {
+    public List<RevCommit> getCommits() {
         return commits;
     }
 
     /**
      * @param commits the commits to set
      */
-    public void setCommits(List<Commit> commits) {
+    public void setCommits(List<RevCommit> commits) {
         this.commits = commits;
     }
 

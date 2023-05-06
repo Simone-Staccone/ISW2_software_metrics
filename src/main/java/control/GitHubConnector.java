@@ -79,7 +79,7 @@ public class GitHubConnector {
             }
         }
 
-        IO.clean(url);
+
 
 
         IO.appendOnLog("Obtained commits for project: " + project.toLowerCase());
@@ -112,7 +112,6 @@ public class GitHubConnector {
         return javaClasses;
 
     }
-
 
 
     /*
@@ -162,16 +161,4 @@ public class GitHubConnector {
 
     }*/
 
-    //Error computing this
-    public static RevCommit getCommitOfRelease(List<RevCommit> commits, Date releaseDate) throws ParseException {
-        Date lastDate = commits.get(commits.size()-1).getAuthorIdent().getWhen();
-        RevCommit lastCommit = commits.get(0);
-        for (RevCommit commit : commits) {
-            if (commit.getAuthorIdent().getWhen().before(releaseDate) && commit.getAuthorIdent().getWhen().after(lastDate)) {
-                lastDate = commit.getAuthorIdent().getWhen();
-                lastCommit = commit;
-            }
-        }
-       return lastCommit;
-    }
 }

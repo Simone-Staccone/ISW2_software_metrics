@@ -1,5 +1,6 @@
 package utils;
 
+import model.ProjectClass;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -10,7 +11,33 @@ import java.util.List;
 
 
 public class IO {
-    private static final String CSV_SEPARATOR = ";";
+    private static final String CSV_SEPARATOR = ",";
+    private final String datasetUrlString;
+    private final String project;
+
+    public IO(String project) {
+        this.datasetUrlString = "C:\\Users\\simon\\ISW2Projects\\Falessi\\src\\main\\data\\" + project + "\\DataSet.csv";
+        this.project = project;
+        IO.clean(datasetUrlString);
+        StringBuilder header = new StringBuilder();
+        System.out.println(Initializer.CATEGORIES);
+        for(String s: Initializer.CATEGORIES){
+            header.append(s).append(CSV_SEPARATOR);
+        }
+        header.delete(header.length()-1,header.length());
+
+        IO.appendOnFile(datasetUrlString, header.toString());
+
+
+    }
+
+    public String getUrl(){
+        return this.datasetUrlString;
+    }
+
+    public String getProjectName(){
+        return this.project;
+    }
 
     public static JSONObject readJsonObject(String url)  {
         try (InputStream is = new URL(url).openStream()) {
@@ -44,16 +71,16 @@ public class IO {
         return sb.toString();
     }
 
-    public static boolean writeOnFile(String projectName, List<List<String>> entries){
+    public boolean writeOnFile( List<List<String>> entries){
         try{
-            String dir = "src" +  File.separator + "main" + File.separator + "data" + File.separator + projectName.toLowerCase() + File.separator;
+            String dir = "src" +  File.separator + "main" + File.separator + "data" + File.separator + project.toLowerCase() + File.separator;
             File directory = new File(dir);
             if(!directory.exists()){
                 if(!directory.mkdir()){
                     throw new IOException();
                 }
             }
-            FileWriter fileWriter = new FileWriter(dir + projectName + Initializer.getOutputFileNameTail());
+            FileWriter fileWriter = new FileWriter(dir + project + Initializer.getOutputFileNameTail());
             fileWriter.append("Index;Version ID;Version Name;Date\n");
             int index = 0;
 
@@ -107,7 +134,7 @@ public class IO {
         }
     }
 
-    public static void clean(String dir) {
+    protected static void clean(String dir) {
         try{
             FileWriter fileWriter = new FileWriter(dir);
             fileWriter.append("");
@@ -116,5 +143,34 @@ public class IO {
         } catch(IOException i){
             i.printStackTrace();
         }
+    }
+
+    public void serializeDataSet(List<ProjectClass> versionClasses) {
+
+
+        for (ProjectClass projectClass: versionClasses) {
+            IO.appendOnFile(this.datasetUrlString,
+                    projectClass.getRelease() +
+                            "," + projectClass.getName() +
+                            "," + projectClass.getLoc() +
+                            "," + projectClass.getLoc() +
+                            "," + projectClass.getLoc() +
+                            "," + projectClass.getLoc() +
+                            "," + projectClass.getLoc() +
+                            "," + projectClass.getLoc() +
+                            "," + projectClass.getLoc() +
+                            "," + projectClass.getLoc() +
+                            "," + projectClass.getLoc() +
+                            "," + projectClass.getLoc() +
+                            "," + projectClass.getLoc() +
+                            "," + projectClass.getLoc() +
+                            "," + projectClass.getLoc() +
+                            "," + projectClass.getLoc() +
+                            "," + projectClass.getLoc() +
+                            "," + "yes"
+            );
+        }
+
+
     }
 }

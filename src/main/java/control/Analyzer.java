@@ -6,6 +6,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 import utils.IO;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -21,51 +22,44 @@ public class Analyzer {
         JiraConnector jiraConnector = new JiraConnector();
 
         for (String project : projects) {
-            IO.appendOnLog("******************************************");
-            IO.appendOnLog("\t  START ANALYZING " + project + "\n");
             try {
                 if (Objects.equals(project, "BOOKKEEPER") || Objects.equals(project, "OPENJPA")) {
-                    Releases releases = jiraConnector.getInfos(project);;
-                    List<RevCommit> commits = GitHubConnector.getCommits(project,releases);
-                    String url = "C:\\Users\\simon\\ISW2Projects\\Falessi\\src\\main\\data\\" + project + "\\DataSet.csv";
-                    IO.clean(url);
-                    for(int i=0;i<releases.getReleaseList().size();i++) {
-                        //releases.getReleaseList().get(i).addProjectClass();
-
+                    IO.appendOnLog("******************************************");
+                    IO.appendOnLog("\t  START ANALYZING " + project + "\n");
+                    Releases releases = jiraConnector.getInfos(project);
+                    IO fileWriter = new IO(project);
+                    List<RevCommit> commits = GitHubConnector.getCommits(project, releases);
+                    for (int i = 0; i < releases.getReleaseList().size(); i++) {
                         Map<String, String> versionClasses = GitHubConnector.getClassesForCommit(releases.getReleaseList().get(i).getLastCommit(), project);
-                        for (String className:versionClasses.keySet()) {
-                            int LOC = 0;
-                            /*for(String javaClass : versionClasses.values()) {
-                                String[] lines = javaClass.split("\r\n|\r|\n");
-                                LOC = ComputeMetrics.computeLOC(lines);
-                            }*/
 
-                            releases.getReleaseList().get(i).addProjectClass(new ProjectClass(i,className,versionClasses.values(),LOC));
-
-                            IO.appendOnFile(url,i + "," + className + "," + LOC);
+                        for (String className : versionClasses.keySet()) {
+                            ProjectClass projectClass = new ProjectClass(i, className, versionClasses.get(className));
+                            releases.getReleaseList().get(i).addProjectClass(projectClass);
                         }
+
+                        fileWriter.serializeDataSet(releases.getReleaseList().get(i).getVersionClasses());
                     }
 
+                    Analyzer.computeLocProperties(releases,fileWriter);
 
 
-
-                    /*List<RevCommit> commits = GitHubConnector.getCommits(project);
-                    List<Release> releases = jiraConnector.getInfos(project,commits).releases;
-                    IO.appendOnLog("Computing data set for project: " + project.toLowerCase());
-                    GitHubConnector.buildDataSet(project, commits);
-                    IO.appendOnLog("Data set successfully saved for project: " + project.toLowerCase());
-                */}
-
+                    IO.appendOnLog("\n\t  FINISHED ANALYZING " + project);
+                    IO.appendOnLog("******************************************\n");
+                }
 
 
             } catch (IOException | GitAPIException e) {
                 IO.appendOnLog("ERROR: Error in data split");
             }
-
-
-
-            IO.appendOnLog("\n\t  FINISHED ANALYZING " + project);
-            IO.appendOnLog("******************************************\n");
         }
+    }
+
+    private static void computeLocProperties(Releases releases, IO fileWriter) {
+        for(int i =1;i<releases.getReleaseList().size();i++){
+            ComputeMetrics.computeLOCMetrics(releases.getReleaseList().get(i-1).getLastCommit(),releases.getReleaseList().get(i).getLastCommit(),
+                    "C:\\Users\\simon\\ISW2Projects\\projects\\" + fileWriter.getProjectName().toLowerCase() + File.separator);
+        }
+
+        //ComputeMetrics.computeLOCMetrics("C:\\Users\\simon\\ISW2Projects\\projects\\" + fileWriter.getProjectName().toLowerCase() + File.separator);
     }
 }

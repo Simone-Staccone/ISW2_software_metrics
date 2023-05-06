@@ -11,16 +11,10 @@ public class Release{
     public String name;
     public Date releaseDate;
     public final List<RevCommit> allCommits = new ArrayList<>();
-    public RevCommit lastCommit = null;
+    public RevCommit lastCommit;
     public int releaseNumber;
     public List<ProjectClass> classes = new ArrayList<>();
 
-    public Release(int id, String name, Date releaseDate, int releaseNumber){
-        this.id = id;
-        this.name = name;
-        this.releaseDate = releaseDate;
-        this.releaseNumber = releaseNumber;
-    }
 
     public Release(int id, String name, Date releaseDate, RevCommit lastCommit, int releaseNumber){
         this.id = id;
@@ -50,16 +44,8 @@ public class Release{
         this.name = name;
     }
 
-    public void setReleaseDate(Date releaseDate) {
-        this.releaseDate = releaseDate;
-    }
-
     public void setLastCommit(RevCommit lastCommit) {
         this.lastCommit = lastCommit;
-    }
-
-    public void setReleaseNumber(int releaseNumber) {
-        this.releaseNumber = releaseNumber;
     }
 
     public int getId() {
@@ -72,10 +58,6 @@ public class Release{
 
     public Date getReleaseDate() {
         return releaseDate;
-    }
-
-    public List<RevCommit> getAllCommits() {
-        return allCommits;
     }
 
     public RevCommit getLastCommit() {

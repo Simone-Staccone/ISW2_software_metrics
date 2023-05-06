@@ -14,7 +14,7 @@ public class Initializer {
     private static String API_URL = null;
     private static String SEARCH_URL_FIRST_HALF = null;
     private static String SEARCH_URL_SECOND_HALF = null;
-    private static List<String> CATEGORIES = null;
+    public static List<String> CATEGORIES = null;
     private static Initializer instance = null;
     private static String LOG_FILE_NAME = null;
 
@@ -30,10 +30,6 @@ public class Initializer {
 
     public List<String> getProjectNames(){
         return PROJECT_NAMES;
-    }
-
-    public static List<String> getCategoriesNames(){
-        return CATEGORIES;
     }
 
     public static String getApiUrl() {
