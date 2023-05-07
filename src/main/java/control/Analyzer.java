@@ -40,7 +40,10 @@ public class Analyzer {
                         fileWriter.serializeDataSet(releases.getReleaseList().get(i).getVersionClasses());
                     }
 
-                    Analyzer.computeLocProperties(releases,fileWriter);
+                    
+                    System.out.println(GitHubConnector.getModifiedClasses(commits.get(1),project));
+
+                    //Analyzer.computeLocProperties(releases,fileWriter);
 
 
                     IO.appendOnLog("\n\t  FINISHED ANALYZING " + project);

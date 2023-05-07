@@ -5,12 +5,15 @@ import model.Releases;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.lib.RepositoryBuilder;
+import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.DiffFormatter;
+import org.eclipse.jgit.internal.storage.file.FileRepository;
+import org.eclipse.jgit.lib.*;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
+import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.TreeWalk;
+import org.eclipse.jgit.util.io.DisabledOutputStream;
 import utils.IO;
 
 import java.io.File;
@@ -113,6 +116,43 @@ public class GitHubConnector {
 
     }
 
+    public static List<String> getModifiedClasses(RevCommit commit, String project) throws IOException {
+        FileRepository repository = new FileRepository("C:\\Users\\simon\\ISW2Projects\\projects\\" + project.toLowerCase() + File.separator + ".git");
+
+        List<String> modifiedClasses = new ArrayList<>();    //Here there will be the names of the classes that have been modified by the commit
+
+        try (DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
+             ObjectReader reader = repository.newObjectReader()) {
+
+            CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
+            ObjectId newTree = commit.getTree();
+            newTreeIter.reset(reader, newTree);
+
+            RevCommit commitParent = commit.getParent(0);    //It's the previous commit of the commit we are considering
+            CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
+            ObjectId oldTree = commitParent.getTree();
+            oldTreeIter.reset(reader, oldTree);
+
+            diffFormatter.setRepository(repository);
+            List<DiffEntry> entries = diffFormatter.scan(oldTreeIter, newTreeIter);
+
+            //Every entry contains info for each file involved in the commit (old path name, new path name, change type (that could be MODIFY, ADD, RENAME, etc.))
+            for (DiffEntry entry : entries) {
+                //We are keeping only Java classes that are not involved in tests
+                if (entry.getChangeType().equals(DiffEntry.ChangeType.MODIFY) && entry.getNewPath().contains(".java") && !entry.getNewPath().contains("/test/")) {
+                    modifiedClasses.add(entry.getNewPath());
+                }
+
+            }
+
+        } catch (ArrayIndexOutOfBoundsException e) {
+            //commit has no parents: skip this commit, return an empty list and go on
+
+        }
+
+        return modifiedClasses;
+
+    }
 
     /*
     public static void buildDataSet(String project, List<RevCommit> commits) throws IOException {
