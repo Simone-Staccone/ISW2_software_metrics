@@ -1,6 +1,7 @@
 package control;
 
 import model.ProjectClass;
+import model.Release;
 import model.Releases;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -35,15 +36,30 @@ public class Analyzer {
                         for (String className : versionClasses.keySet()) {
                             ProjectClass projectClass = new ProjectClass(i, className, versionClasses.get(className));
                             releases.getReleaseList().get(i).addProjectClass(projectClass);
+
                         }
 
-                        fileWriter.serializeDataSet(releases.getReleaseList().get(i).getVersionClasses());
+                        //System.out.println(releases.getReleaseList().get(i).getReleaseClasses()); //Check why no commit for first release
                     }
 
-                    
-                    System.out.println(GitHubConnector.getModifiedClasses(commits.get(1),project));
+                    GitHubConnector.computeCommitForClass(releases,commits,fileWriter.getProjectName());  //Associate each commit to a projectClass
 
-                    //Analyzer.computeLocProperties(releases,fileWriter);
+
+
+
+
+                    int i =0;
+                    for(Release release: releases.getReleaseList()){
+                        System.out.println(i + " " + release.getVersionClasses().size());
+                        for (ProjectClass projectClass:release.getVersionClasses()) {
+                            GitHubConnector.computeAddedAndDeletedLinesList(projectClass, fileWriter.getProjectName());
+                            ComputeMetrics.computeLocAndChurnMetrics(projectClass);
+                        }
+                        ComputeMetrics.computeNR(release.getVersionClasses());
+                        ComputeMetrics.computeAuthorsNumber(release.getVersionClasses());
+                        fileWriter.serializeDataSet(release.getVersionClasses());
+                        i++;
+                    }
 
 
                     IO.appendOnLog("\n\t  FINISHED ANALYZING " + project);
@@ -57,12 +73,19 @@ public class Analyzer {
         }
     }
 
-    private static void computeLocProperties(Releases releases, IO fileWriter) {
-        for(int i =1;i<releases.getReleaseList().size();i++){
-            ComputeMetrics.computeLOCMetrics(releases.getReleaseList().get(i-1).getLastCommit(),releases.getReleaseList().get(i).getLastCommit(),
-                    "C:\\Users\\simon\\ISW2Projects\\projects\\" + fileWriter.getProjectName().toLowerCase() + File.separator);
-        }
 
-        //ComputeMetrics.computeLOCMetrics("C:\\Users\\simon\\ISW2Projects\\projects\\" + fileWriter.getProjectName().toLowerCase() + File.separator);
+
+
+    private static void computeLocProperties(Releases releases, IO fileWriter) {
+        for (Release release: releases.getReleaseList()) {
+            int totalCommit =0;
+            for (ProjectClass projectClass: release.getVersionClasses()) {
+                for (RevCommit commit:projectClass.getCommits()) {
+                    //ComputeMetrics.computeLOCMetrics("C:\\Users\\simon\\ISW2Projects\\projects\\" + fileWriter.getProjectName().toLowerCase(), commit, projectClass);
+                    totalCommit = totalCommit + 1;
+                }
+            }
+            System.out.println("Number of commits for release: " + totalCommit);
+        }
     }
 }

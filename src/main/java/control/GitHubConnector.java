@@ -1,12 +1,16 @@
 package control;
 
 
+import model.ProjectClass;
+import model.Release;
 import model.Releases;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
+import org.eclipse.jgit.diff.Edit;
+import org.eclipse.jgit.diff.RawTextComparator;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.*;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -116,7 +120,7 @@ public class GitHubConnector {
 
     }
 
-    public static List<String> getModifiedClasses(RevCommit commit, String project) throws IOException {
+    private static List<String> getModifiedClasses(RevCommit commit, String project) throws IOException {
         FileRepository repository = new FileRepository("C:\\Users\\simon\\ISW2Projects\\projects\\" + project.toLowerCase() + File.separator + ".git");
 
         List<String> modifiedClasses = new ArrayList<>();    //Here there will be the names of the classes that have been modified by the commit
@@ -152,6 +156,89 @@ public class GitHubConnector {
 
         return modifiedClasses;
 
+    }
+
+    private static int getAddedLines(DiffFormatter diffFormatter, DiffEntry entry) throws IOException {
+
+        int addedLines = 0;
+        for(Edit edit : diffFormatter.toFileHeader(entry).toEditList()) {
+            addedLines += edit.getEndA() - edit.getBeginA();
+
+        }
+        return addedLines;
+
+    }
+
+    private static int getDeletedLines(DiffFormatter diffFormatter, DiffEntry entry) throws IOException {
+
+        int deletedLines = 0;
+        for(Edit edit : diffFormatter.toFileHeader(entry).toEditList()) {
+            deletedLines += edit.getEndB() - edit.getBeginB();
+
+        }
+        return deletedLines;
+
+    }
+
+    public static void computeAddedAndDeletedLinesList(ProjectClass projectClass, String project) throws IOException {
+        FileRepository repo = new FileRepository("C:\\Users\\simon\\ISW2Projects\\projects\\" + project.toLowerCase() + File.separator + ".git");
+
+        for(RevCommit comm : projectClass.getCommits()) {
+            try(DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE)) {
+
+                RevCommit parentComm = comm.getParent(0);
+
+                diffFormatter.setRepository(repo);
+                diffFormatter.setDiffComparator(RawTextComparator.DEFAULT);
+
+                List<DiffEntry> diffs = diffFormatter.scan(parentComm.getTree(), comm.getTree());
+                for(DiffEntry entry : diffs) {
+                    if(entry.getNewPath().equals(projectClass.getName())) {
+                        int locAdded = getAddedLines(diffFormatter, entry);
+                        int locDeleted = getDeletedLines(diffFormatter, entry);
+                        projectClass.getAddedLinesList().add(locAdded);
+                        projectClass.setLocAdded(locAdded);
+                        projectClass.getDeletedLinesList().add(locDeleted);
+
+                    }
+
+                }
+
+            } catch(ArrayIndexOutOfBoundsException e) {
+                //commit has no parents: skip this commit, return an empty list and go on
+
+            }
+
+        }
+
+
+    }
+
+
+
+
+    public static void computeCommitForClass(Releases releases, List<RevCommit> commits, String projectName) {
+        try {
+            System.out.println("Total commits: " + commits.size());
+            int i = 0;
+            for(RevCommit commit: commits){
+                List<String> classNamesList = GitHubConnector.getModifiedClasses(commit,projectName);
+                System.out.println("Commit number: " + i);
+                i++;
+                for (Release release:
+                     releases.getReleaseList()) {
+                    for(ProjectClass projectClass:release.getVersionClasses()){
+                        for(String className: classNamesList){
+                            if(projectClass.getName().equals(className) && !projectClass.getCommits().contains(commit)){
+                                projectClass.addCommit(commit);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /*

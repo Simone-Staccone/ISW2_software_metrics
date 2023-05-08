@@ -14,9 +14,3 @@ Obtained commits for project: bookkeeper
 
 Starting getting commits for project: openjpa...
 Obtained commits for project: openjpa
-
-	  FINISHED ANALYZING OPENJPA
-******************************************
-
-SOFTWARE METRICS ANALYZER SUCCESSFULLY STOPPED
-

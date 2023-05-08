@@ -10,7 +10,7 @@ public class ProjectClass {
     private String name;
     private String content;
     private int release;
-    private List<RevCommit> commits;    //These are the commits of the specified release that have modified the class
+    private List<RevCommit> commits = new ArrayList<>();    //These are the commits of the specified release that have modified the class
     private boolean isBuggy;
 
     private int loc;
@@ -25,6 +25,8 @@ public class ProjectClass {
 
     private List<Integer> addedLinesList;
     private List<Integer> deletedLinesList;
+    private int deletedLoc;
+    private int modifiedLoc;
 
     public ProjectClass(int release, String name, String content) {
         this.name = name;
@@ -46,6 +48,7 @@ public class ProjectClass {
         this.deletedLinesList = new ArrayList<>();
 
     }
+
 
     /**
      * @return the name
@@ -269,5 +272,25 @@ public class ProjectClass {
      */
     public void setDeletedLinesList(List<Integer> deletedLinesList) {
         this.deletedLinesList = deletedLinesList;
+    }
+
+    public void addCommit(RevCommit commit) {
+        this.commits.add(commit);
+    }
+
+    public void setDeletedLoc(int linesDeleted) {
+        this.deletedLoc = linesDeleted;
+    }
+
+    public void setModifiedLoc(int filesChanged) {
+        this.modifiedLoc = filesChanged;
+    }
+
+    public int getLocDeleted() {
+        return this.deletedLoc;
+    }
+
+    public int getLocModified() {
+        return this.modifiedLoc;
     }
 }

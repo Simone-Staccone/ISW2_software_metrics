@@ -153,16 +153,16 @@ public class IO {
                     projectClass.getRelease() +
                             "," + projectClass.getName() +
                             "," + projectClass.getLoc() +
-                            "," + projectClass.getLoc() +
-                            "," + projectClass.getLoc() +
-                            "," + projectClass.getLoc() +
-                            "," + projectClass.getLoc() +
-                            "," + projectClass.getLoc() +
-                            "," + projectClass.getLoc() +
-                            "," + projectClass.getLoc() +
-                            "," + projectClass.getLoc() +
-                            "," + projectClass.getLoc() +
-                            "," + projectClass.getLoc() +
+                            "," + projectClass.getLocAdded() +
+                            "," + projectClass.getLocDeleted() +
+                            "," + projectClass.getLocModified() +
+                            "," + projectClass.getnAuth() +
+                            "," + projectClass.getNr() +
+                            "," + projectClass.getMaxLocAdded() +
+                            "," + projectClass.getAvgLocAdded() +
+                            "," + projectClass.getChurn() +
+                            "," + projectClass.getMaxChurn() +
+                            "," + projectClass.getAvgChurn() +
                             "," + projectClass.getLoc() +
                             "," + projectClass.getLoc() +
                             "," + projectClass.getLoc() +
