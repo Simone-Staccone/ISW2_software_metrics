@@ -155,7 +155,6 @@ public class IO {
                             "," + projectClass.getLoc() +
                             "," + projectClass.getLocAdded() +
                             "," + projectClass.getLocDeleted() +
-                            "," + projectClass.getLocModified() +
                             "," + projectClass.getnAuth() +
                             "," + projectClass.getNr() +
                             "," + projectClass.getMaxLocAdded() +
@@ -163,10 +162,8 @@ public class IO {
                             "," + projectClass.getChurn() +
                             "," + projectClass.getMaxChurn() +
                             "," + projectClass.getAvgChurn() +
-                            "," + projectClass.getLoc() +
-                            "," + projectClass.getLoc() +
-                            "," + projectClass.getLoc() +
-                            "," + projectClass.getLoc() +
+                            "," + projectClass.getFanOut() +
+                            "," + projectClass.getMethodNumber() +
                             "," + "yes"
             );
         }

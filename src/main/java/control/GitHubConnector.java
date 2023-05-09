@@ -15,15 +15,16 @@ import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.*;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
+import utils.DateParser;
 import utils.IO;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
 import java.util.*;
 
 public class GitHubConnector {
@@ -31,10 +32,9 @@ public class GitHubConnector {
         throw new IllegalAccessException("Can't initialize this class");
     }
 
-    public static List<RevCommit> getCommits(String project,Releases releases) throws IOException, GitAPIException {
+    public static List<RevCommit> getCommits(String project) throws IOException, GitAPIException {
         List<RevCommit> revCommits = new ArrayList<>();
         RepositoryBuilder repositoryBuilder = new RepositoryBuilder();
-        String url = "C:\\Users\\simon\\ISW2Projects\\Falessi\\src\\main\\data\\" + project.toLowerCase() + File.separator + "dataSet.csv";
 
         Repository repo = repositoryBuilder
                 .findGitDir(new File("C:\\Users\\simon\\ISW2Projects\\projects\\" + project.toLowerCase() + File.separator))
@@ -54,39 +54,12 @@ public class GitHubConnector {
         for(Ref branch : branchesList) {
             Iterable<RevCommit> commitsList = git.log().add(repo.resolve(branch.getName())).call(); //Only get commit in present branch
 
-            for(RevCommit commit : commitsList) {
-                if(!revCommits.contains(commit)) {
+            for (RevCommit commit : commitsList) {
+                if (!revCommits.contains(commit)) {
                     revCommits.add(commit);
-
-
-                    if (commit.getAuthorIdent().getWhen().before(releases.getReleaseList().get(0).getReleaseDate())) {
-                        releases.getReleaseList().get(0).addCommit(commit);
-                        if(releases.getReleaseList().get(0).getLastCommit() == null){
-                            releases.getReleaseList().get(0).setLastCommit(commit);
-                        }
-                        if (commit.getAuthorIdent().getWhen().before(releases.getReleaseList().get(0).getLastCommit().getAuthorIdent().getWhen())) {
-                            releases.getReleaseList().get(0).setLastCommit(commit);
-                        }
-                    } else {
-                        for (int i = 1; i < releases.getReleaseList().size(); i++) {
-                            if(releases.getReleaseList().get(i).getLastCommit() == null){
-                                releases.getReleaseList().get(i).setLastCommit(commit);
-                            }
-
-                            if (commit.getAuthorIdent().getWhen().before(releases.getReleaseList().get(i).getReleaseDate())
-                                    && commit.getAuthorIdent().getWhen().after(releases.getReleaseList().get(i - 1).getReleaseDate())) {
-                                releases.getReleaseList().get(i).addCommit(commit);
-                                if (commit.getAuthorIdent().getWhen().before(releases.getReleaseList().get(i).getLastCommit().getAuthorIdent().getWhen())) {
-                                    releases.getReleaseList().get(i).setLastCommit(commit);
-                                }
-                            }
-                        }
-                    }
                 }
             }
         }
-
-
 
 
         IO.appendOnLog("Obtained commits for project: " + project.toLowerCase());
@@ -100,9 +73,9 @@ public class GitHubConnector {
                 .findGitDir(new File("C:\\Users\\simon\\ISW2Projects\\projects\\" + project.toLowerCase() + File.separator))
                 .setMustExist(true)
                 .build();
-        Map<String, String> javaClasses = new HashMap<>();
+        Map<String, String> projectClasses = new HashMap<>();
 
-        RevTree tree = commit.getTree();	//We get the tree of the files and the directories that were belonging to the repository when commit was pushed
+        RevTree tree = commit.getTree();	//We get the tree of the files and the directories that belong to the repository when commit was pushed
         TreeWalk treeWalk = new TreeWalk(repository);	//We use a TreeWalk to iterate over all files in the Tree recursively
         treeWalk.addTree(tree);
         treeWalk.setRecursive(true);
@@ -111,12 +84,12 @@ public class GitHubConnector {
             //We are keeping only Java classes that are not involved in tests
             if(treeWalk.getPathString().contains(".java") && !treeWalk.getPathString().contains("/test/")) {
                 //We are retrieving (name class, content class) couples
-                javaClasses.put(treeWalk.getPathString(), new String(repository.open(treeWalk.getObjectId(0)).getBytes(), StandardCharsets.UTF_8));
+                projectClasses.put(treeWalk.getPathString(), new String(repository.open(treeWalk.getObjectId(0)).getBytes(), StandardCharsets.UTF_8));
             }
         }
         treeWalk.close();
 
-        return javaClasses;
+        return projectClasses;
 
     }
 
@@ -126,6 +99,7 @@ public class GitHubConnector {
         List<String> modifiedClasses = new ArrayList<>();    //Here there will be the names of the classes that have been modified by the commit
 
         try (DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
+
              ObjectReader reader = repository.newObjectReader()) {
 
             CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
@@ -143,7 +117,7 @@ public class GitHubConnector {
             //Every entry contains info for each file involved in the commit (old path name, new path name, change type (that could be MODIFY, ADD, RENAME, etc.))
             for (DiffEntry entry : entries) {
                 //We are keeping only Java classes that are not involved in tests
-                if (entry.getChangeType().equals(DiffEntry.ChangeType.MODIFY) && entry.getNewPath().contains(".java") && !entry.getNewPath().contains("/test/")) {
+                if (entry.getNewPath().contains(".java") && !entry.getNewPath().contains("/test/")) {
                     modifiedClasses.add(entry.getNewPath());
                 }
 
@@ -158,30 +132,33 @@ public class GitHubConnector {
 
     }
 
-    private static int getAddedLines(DiffFormatter diffFormatter, DiffEntry entry) throws IOException {
+    public static int getAddedLines(DiffFormatter diffFormatter, DiffEntry entry) throws IOException {
 
         int addedLines = 0;
         for(Edit edit : diffFormatter.toFileHeader(entry).toEditList()) {
-            addedLines += edit.getEndA() - edit.getBeginA();
+            addedLines += edit.getEndB() - edit.getBeginB();
 
         }
         return addedLines;
 
     }
 
-    private static int getDeletedLines(DiffFormatter diffFormatter, DiffEntry entry) throws IOException {
+    public static int getDeletedLines(DiffFormatter diffFormatter, DiffEntry entry) throws IOException {
 
         int deletedLines = 0;
         for(Edit edit : diffFormatter.toFileHeader(entry).toEditList()) {
-            deletedLines += edit.getEndB() - edit.getBeginB();
+            deletedLines += edit.getEndA() - edit.getBeginA();
 
         }
         return deletedLines;
 
     }
 
+
     public static void computeAddedAndDeletedLinesList(ProjectClass projectClass, String project) throws IOException {
         FileRepository repo = new FileRepository("C:\\Users\\simon\\ISW2Projects\\projects\\" + project.toLowerCase() + File.separator + ".git");
+        int sumLocAdded = 0;
+        int sumLocDel = 0;
 
         for(RevCommit comm : projectClass.getCommits()) {
             try(DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE)) {
@@ -197,9 +174,9 @@ public class GitHubConnector {
                         int locAdded = getAddedLines(diffFormatter, entry);
                         int locDeleted = getDeletedLines(diffFormatter, entry);
                         projectClass.getAddedLinesList().add(locAdded);
-                        projectClass.setLocAdded(locAdded);
+                        sumLocAdded = sumLocAdded + locAdded;
                         projectClass.getDeletedLinesList().add(locDeleted);
-
+                        sumLocDel = sumLocDel + locDeleted;
                     }
 
                 }
@@ -210,82 +187,74 @@ public class GitHubConnector {
             }
 
         }
-
-
+        projectClass.setLocAdded(sumLocAdded);
+        projectClass.setDeletedLoc(sumLocDel);
+        ComputeMetrics.computeLocAndChurnMetrics(projectClass);
     }
 
 
-
-
-    public static void computeCommitForClass(Releases releases, List<RevCommit> commits, String projectName) {
+    public static void computeCommitForClass(Releases releases, String projectName) {
         try {
-            System.out.println("Total commits: " + commits.size());
-            int i = 0;
-            for(RevCommit commit: commits){
-                List<String> classNamesList = GitHubConnector.getModifiedClasses(commit,projectName);
-                System.out.println("Commit number: " + i);
-                i++;
-                for (Release release:
-                     releases.getReleaseList()) {
-                    for(ProjectClass projectClass:release.getVersionClasses()){
-                        for(String className: classNamesList){
-                            if(projectClass.getName().equals(className) && !projectClass.getCommits().contains(commit)){
+            for (Release release : releases.getReleaseList()) {
+                for (RevCommit commit : release.allCommits) {
+                    List<String> classNamesList = GitHubConnector.getModifiedClasses(commit, projectName);
+                    for (String className : classNamesList) {
+                        for (ProjectClass projectClass : release.getVersionClasses()) {
+                            if (projectClass.getName().compareTo(className) == 0) {
                                 projectClass.addCommit(commit);
                             }
                         }
                     }
                 }
+
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    /*
-    public static void buildDataSet(String project, List<RevCommit> commits) throws IOException {
-        List<ProjectClass> projectClasses = new ArrayList<>();
-        Map<String, String> projectClassesText = getProjectClassesText(project);
-        List<String> projectClassesTexts = new ArrayList<>();
-        List<String> projectClassesNames = new ArrayList<>(projectClassesText.keySet());
-        List<Integer> LOC = new ArrayList<>();
-        ComputeMetrics computer = new ComputeMetrics();
-        List<Integer> nAuthors = new ArrayList<>();
+    public static void splitCommitsIntoReleases(List<RevCommit> commits, Releases releases) {
+        for (RevCommit commit : commits) {
+            if (releases.getReleaseList().get(0).getLastCommit() == null && commit.getAuthorIdent().getWhen().before(releases.getReleaseList().get(0).getReleaseDate()) ) {
+                releases.getReleaseList().get(0).setLastCommit(commit);
+            }
+            if (commit.getAuthorIdent().getWhen().before(releases.getReleaseList().get(0).getReleaseDate()) ||
+                    commit.getAuthorIdent().getWhen().compareTo(releases.getReleaseList().get(0).getReleaseDate()) == 0) {
+                releases.getReleaseList().get(0).addCommit(commit);
+                if (commit.getAuthorIdent().getWhen().after(releases.getReleaseList().get(0).getLastCommit().getAuthorIdent().getWhen())) {
+                    releases.getReleaseList().get(0).setLastCommit(commit);
+                }
+            }
 
+            for (int i = 1; i < releases.getReleaseList().size(); i++) {
+                if (releases.getReleaseList().get(i).getLastCommit() == null && commit.getAuthorIdent().getWhen().before(releases.getReleaseList().get(i).getReleaseDate())) {
+                    releases.getReleaseList().get(i).setLastCommit(commit);
+                }
 
-        for(String javaClass : projectClassesText.values()) {
-            String[] lines = javaClass.split("\r\n|\r|\n");
-            projectClassesTexts.add(javaClass);
-            LOC.add(computer.computeLOC(lines));
-            nAuthors.add(computer.computeNAuth(javaClass,commits));
+                if ( ( commit.getAuthorIdent().getWhen().before(releases.getReleaseList().get(i).getReleaseDate()) && commit.getAuthorIdent().getWhen().after(releases.getReleaseList().get(i - 1).getReleaseDate()) )
+                 || commit.getAuthorIdent().getWhen().compareTo(releases.getReleaseList().get(i).getReleaseDate()) == 0) {
+                    releases.getReleaseList().get(i).addCommit(commit);
+                    if (commit.getAuthorIdent().getWhen().after(releases.getReleaseList().get(i).getLastCommit().getAuthorIdent().getWhen())) {
+                        releases.getReleaseList().get(i).setLastCommit(commit);
+                    }
+                }
+            }
         }
+    }
 
-        for(int i=0;i<LOC.size();i++){
-            projectClasses.add(
-                    new ProjectClass(
-                            projectClassesNames.get(i),
-                            projectClassesTexts.get(i),
-                           new Release(0,"",new Date(),commits.get(0),  1),
-                            LOC.get(i),
-                            nAuthors.get(i)
-                            ));
+
+    public static void computeLocForClassInRelease(Release release) {
+        for (ProjectClass projectClass:release.getVersionClasses()) {
+            projectClass.setLoc(ComputeMetrics.computeLOC(projectClass.getContent()));
         }
-        String url = "C:\\Users\\simon\\ISW2Projects\\Falessi\\src\\main\\data\\" + project.toLowerCase() + File.separator + "dataSet.csv";
+    }
 
-        IO.clean(url);
+    public static void setFanOut(ProjectClass projectClass) {
+        projectClass.setFanOut(DateParser.countMatches(projectClass.getContent(), "new"));
+    }
 
-        IO.appendOnFile(url, Initializer.getCategoriesNames().toString());
-        for(ProjectClass projectClass:projectClasses){
-            IO.appendOnFile(url,
-                    "1," +
-                            projectClass.getName() +
-                            "," +
-                            projectClass.getLoc() +
-                            "," +
-                            "," +
-                            "," +
-                            projectClass.getnAuth());
-        }
-
-    }*/
-
+    public static void setMethodsNumber(ProjectClass projectClass) {
+        projectClass.setMethodsNumber(DateParser.countMatches(projectClass.getContent(), "public") + DateParser.countMatches(projectClass.getContent(), "private"));
+    }
 }

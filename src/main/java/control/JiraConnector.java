@@ -22,7 +22,7 @@ public class JiraConnector {
 		List<List<String>> entries = new ArrayList<>();
 		for (int i = 0; i < versions.length()/2; i++ ) { //I take only half of the versions
 			List<String> entry = new ArrayList<>();
-			if(versions.getJSONObject(i).has("releaseDate") && versions.getJSONObject(i).has("name") && versions.getJSONObject(i).has("id")) { //Considering releases only with date, name and id
+			if(versions.getJSONObject(i).has("releaseDate") && versions.getJSONObject(i).has("name") && versions.getJSONObject(i).has("id") && versions.getJSONObject(i).getBoolean("released")) { //Considering releases only with date, name and id
 				entry.add(versions.getJSONObject(i).get("id").toString());
 				entry.add(versions.getJSONObject(i).get("name").toString());
 				entry.add(versions.getJSONObject(i).get("releaseDate").toString());
@@ -113,41 +113,4 @@ public class JiraConnector {
 
 		return ticketList;
 	}
-
-
-/*
-	public TicketVersion getInfos(String projectName, List<RevCommit> commits) throws InvalidDataException {
-		JSONObject resultSet = IO.readJsonObject(Initializer.getApiUrl() + projectName); //Get the JSON result from the url to see all the issues
-		List<List<String>> entries = getVersionInfo(Objects.requireNonNull(resultSet).getJSONArray("versions"));
-		TicketVersion apiResultVersion = new TicketVersion(entries,commits);
-
-
-
-		JSONObject secondResultSet = IO.readJsonObject(Initializer.getSearchUrlFirstHalf()
-				+ projectName
-				+ Initializer.getSearchUrlSecondHalf()); //Get the JSON result from the url to see all the versions
-
-		JSONArray issues = Objects.requireNonNull(secondResultSet).getJSONArray("issues");
-		Issue apiResultIssues = new Issue(issues,apiResultVersion.getReleases());
-		List<AffectedVersionTicket> affectedVersionTickets = apiResultIssues.getAffectedVersionTickets();
-		List<ProportionTicket> proportionTickets  = apiResultIssues.getProportionTickets();
-		int countAffected = affectedVersionTickets.size(), countProportion = proportionTickets.size();
-
-
-
-
-		IO.appendOnLog("Issues with affected version: " + countAffected);
-		IO.appendOnLog("Issues used in proportion: " + countProportion);
-		IO.appendOnLog("Total issues: " + issues.length());
-		IO.appendOnLog("Percentage of issues with affected versions: " + Math.round( ( (float) countAffected/ issues.length() ) * 10000.0) / 100.0 + "%");
-		IO.appendOnLog("Percentage of issues used in proportion: " + Math.round( ( (float) countProportion/ issues.length() ) * 10000.0) / 100.0 + "%");
-		IO.appendOnLog("Number of releases: " + apiResultVersion);
-
-		if(IO.writeOnFile(projectName,entries)){
-			IO.appendOnLog("File for " + projectName +  " project created correctly!");
-		}else{
-			IO.appendOnLog("ERROR: Error in writing on " + projectName + "project file!");
-		}
-		return apiResultVersion;
-	}*/
 }

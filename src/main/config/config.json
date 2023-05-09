@@ -18,7 +18,6 @@
     "LOC",
     "LOC_added",
     "LOC_deleted",
-    "LOC_modified",
     "NAuth",
     "NR",
     "MAX_LOC_added",
@@ -26,10 +25,8 @@
     "Churn",
     "MAX_Churn",
     "AVG_churn",
-    "...",
-    "...",
-    "...",
-    "...",
+    "Fan_Out",
+    "Method_Number",
     "Buggy"
   ],
   "LOG_FILE_NAME" : "log.txt"

@@ -7,7 +7,6 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 import utils.IO;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -29,36 +28,34 @@ public class Analyzer {
                     IO.appendOnLog("\t  START ANALYZING " + project + "\n");
                     Releases releases = jiraConnector.getInfos(project);
                     IO fileWriter = new IO(project);
-                    List<RevCommit> commits = GitHubConnector.getCommits(project, releases);
+                    List<RevCommit> commits = GitHubConnector.getCommits(project);
+                    GitHubConnector.splitCommitsIntoReleases(commits, releases);
+
                     for (int i = 0; i < releases.getReleaseList().size(); i++) {
                         Map<String, String> versionClasses = GitHubConnector.getClassesForCommit(releases.getReleaseList().get(i).getLastCommit(), project);
 
                         for (String className : versionClasses.keySet()) {
                             ProjectClass projectClass = new ProjectClass(i, className, versionClasses.get(className));
                             releases.getReleaseList().get(i).addProjectClass(projectClass);
-
+                            GitHubConnector.setFanOut(projectClass);
+                            GitHubConnector.setMethodsNumber(projectClass);
                         }
 
-                        //System.out.println(releases.getReleaseList().get(i).getReleaseClasses()); //Check why no commit for first release
                     }
 
-                    GitHubConnector.computeCommitForClass(releases,commits,fileWriter.getProjectName());  //Associate each commit to a projectClass
+                    GitHubConnector.computeCommitForClass(releases, fileWriter.getProjectName());  //Associate each commit to a projectClass
 
 
 
-
-
-                    int i =0;
                     for(Release release: releases.getReleaseList()){
-                        System.out.println(i + " " + release.getVersionClasses().size());
+                        GitHubConnector.computeLocForClassInRelease(release);
                         for (ProjectClass projectClass:release.getVersionClasses()) {
-                            GitHubConnector.computeAddedAndDeletedLinesList(projectClass, fileWriter.getProjectName());
-                            ComputeMetrics.computeLocAndChurnMetrics(projectClass);
+                            GitHubConnector.computeAddedAndDeletedLinesList(projectClass,project);
                         }
+
                         ComputeMetrics.computeNR(release.getVersionClasses());
                         ComputeMetrics.computeAuthorsNumber(release.getVersionClasses());
                         fileWriter.serializeDataSet(release.getVersionClasses());
-                        i++;
                     }
 
 

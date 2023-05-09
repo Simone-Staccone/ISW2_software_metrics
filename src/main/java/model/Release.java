@@ -11,7 +11,7 @@ public class Release{
     public String name;
     public Date releaseDate;
     public final List<RevCommit> allCommits = new ArrayList<>();
-    public RevCommit lastCommit;
+    public RevCommit lastCommit = null;
     public int releaseNumber;
     public List<ProjectClass> classes = new ArrayList<>();
 

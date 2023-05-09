@@ -1,17 +1,15 @@
 package model;
 
-import control.ComputeMetrics;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ProjectClass {
-    private String name;
-    private String content;
-    private int release;
-    private List<RevCommit> commits = new ArrayList<>();    //These are the commits of the specified release that have modified the class
-    private boolean isBuggy;
+    private final String name;
+    private final String content;
+    private final int release;
+    private final List<RevCommit> commits = new ArrayList<>();    //These are the commits of the specified release that have modified the class
 
     private int loc;
     private int nr;
@@ -23,17 +21,17 @@ public class ProjectClass {
     private int maxChurn;
     private double avgChurn;
 
-    private List<Integer> addedLinesList;
-    private List<Integer> deletedLinesList;
+    private final List<Integer> addedLinesList;
+    private final List<Integer> deletedLinesList;
     private int deletedLoc;
-    private int modifiedLoc;
+    private int fanOut;
+    private int methodsNumber;
 
     public ProjectClass(int release, String name, String content) {
         this.name = name;
         this.content = content;
         this.release = release;
-        this.isBuggy = false;
-        this.loc = ComputeMetrics.computeLOC(content);
+        this.loc = 0;
         this.nAuth = 0;
 
         this.nr = 0;
@@ -43,6 +41,8 @@ public class ProjectClass {
         this.churn = 0;
         this.maxChurn = 0;
         this.avgChurn = 0;
+        this.fanOut = 0;
+        this.methodsNumber = 0;
 
         this.addedLinesList = new ArrayList<>();
         this.deletedLinesList = new ArrayList<>();
@@ -58,24 +58,10 @@ public class ProjectClass {
     }
 
     /**
-     * @param name the name to set
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
      * @return the content
      */
     public String getContent() {
         return content;
-    }
-
-    /**
-     * @param content the content to set
-     */
-    public void setContent(String content) {
-        this.content = content;
     }
 
     /**
@@ -86,38 +72,10 @@ public class ProjectClass {
     }
 
     /**
-     * @param release the release to set
-     */
-    public void setRelease(int release) {
-        this.release = release;
-    }
-
-    /**
      * @return the commits
      */
     public List<RevCommit> getCommits() {
         return commits;
-    }
-
-    /**
-     * @param commits the commits to set
-     */
-    public void setCommits(List<RevCommit> commits) {
-        this.commits = commits;
-    }
-
-    /**
-     * @return the isBuggy
-     */
-    public boolean isBuggy() {
-        return isBuggy;
-    }
-
-    /**
-     * @param isBuggy the isBuggy to set
-     */
-    public void setBuggy(boolean isBuggy) {
-        this.isBuggy = isBuggy;
     }
 
     /**
@@ -254,24 +212,10 @@ public class ProjectClass {
     }
 
     /**
-     * @param addedLinesList the addedLinesList to set
-     */
-    public void setAddedLinesList(List<Integer> addedLinesList) {
-        this.addedLinesList = addedLinesList;
-    }
-
-    /**
      * @return the deletedLinesList
      */
     public List<Integer> getDeletedLinesList() {
         return deletedLinesList;
-    }
-
-    /**
-     * @param deletedLinesList the deletedLinesList to set
-     */
-    public void setDeletedLinesList(List<Integer> deletedLinesList) {
-        this.deletedLinesList = deletedLinesList;
     }
 
     public void addCommit(RevCommit commit) {
@@ -282,15 +226,24 @@ public class ProjectClass {
         this.deletedLoc = linesDeleted;
     }
 
-    public void setModifiedLoc(int filesChanged) {
-        this.modifiedLoc = filesChanged;
-    }
 
     public int getLocDeleted() {
         return this.deletedLoc;
     }
 
-    public int getLocModified() {
-        return this.modifiedLoc;
+    public int getFanOut() {
+        return fanOut;
+    }
+
+    public void setFanOut(int fanOut) {
+        this.fanOut = fanOut;
+    }
+
+    public void setMethodsNumber(int methodsNumber) {
+        this.methodsNumber = methodsNumber;
+    }
+
+    public int getMethodNumber() {
+        return this.methodsNumber;
     }
 }
