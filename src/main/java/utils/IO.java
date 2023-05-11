@@ -20,7 +20,6 @@ public class IO {
         this.project = project;
         IO.clean(datasetUrlString);
         StringBuilder header = new StringBuilder();
-        System.out.println(Initializer.CATEGORIES);
         for(String s: Initializer.CATEGORIES){
             header.append(s).append(CSV_SEPARATOR);
         }
@@ -149,6 +148,8 @@ public class IO {
 
 
         for (ProjectClass projectClass: versionClasses) {
+            String buggy = projectClass.isBug() ? "Yes" : "No";
+
             IO.appendOnFile(this.datasetUrlString,
                     projectClass.getRelease() +
                             "," + projectClass.getName() +
@@ -164,7 +165,7 @@ public class IO {
                             "," + projectClass.getAvgChurn() +
                             "," + projectClass.getFanOut() +
                             "," + projectClass.getMethodNumber() +
-                            "," + "yes"
+                            "," + buggy
             );
         }
 

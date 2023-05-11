@@ -15,17 +15,19 @@ public class ProjectClass {
     private int nr;
     private int nAuth;
     private int locAdded;
+    private int deletedLoc;
     private int maxLocAdded;
     private double avgLocAdded;
     private int churn;
     private int maxChurn;
     private double avgChurn;
+    private int fanOut;
+    private int methodsNumber;
+    private boolean bug;
 
     private final List<Integer> addedLinesList;
     private final List<Integer> deletedLinesList;
-    private int deletedLoc;
-    private int fanOut;
-    private int methodsNumber;
+
 
     public ProjectClass(int release, String name, String content) {
         this.name = name;
@@ -43,6 +45,7 @@ public class ProjectClass {
         this.avgChurn = 0;
         this.fanOut = 0;
         this.methodsNumber = 0;
+        this.bug = false;
 
         this.addedLinesList = new ArrayList<>();
         this.deletedLinesList = new ArrayList<>();
@@ -245,5 +248,13 @@ public class ProjectClass {
 
     public int getMethodNumber() {
         return this.methodsNumber;
+    }
+
+    public boolean isBug() {
+        return bug;
+    }
+
+    public void setBug(boolean bug) {
+        this.bug = bug;
     }
 }

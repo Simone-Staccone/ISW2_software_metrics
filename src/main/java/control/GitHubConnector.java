@@ -15,7 +15,6 @@ import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.*;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
-import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
@@ -25,7 +24,10 @@ import utils.IO;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GitHubConnector {
     private GitHubConnector() throws IllegalAccessException {
@@ -93,7 +95,7 @@ public class GitHubConnector {
 
     }
 
-    private static List<String> getModifiedClasses(RevCommit commit, String project) throws IOException {
+    public static List<String> getModifiedClasses(RevCommit commit, String project) throws IOException {
         FileRepository repository = new FileRepository("C:\\Users\\simon\\ISW2Projects\\projects\\" + project.toLowerCase() + File.separator + ".git");
 
         List<String> modifiedClasses = new ArrayList<>();    //Here there will be the names of the classes that have been modified by the commit
@@ -181,7 +183,7 @@ public class GitHubConnector {
 
                 }
 
-            } catch(ArrayIndexOutOfBoundsException e) {
+            } catch(ArrayIndexOutOfBoundsException ignore) {
                 //commit has no parents: skip this commit, return an empty list and go on
 
             }

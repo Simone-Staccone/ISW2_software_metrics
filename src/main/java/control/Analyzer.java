@@ -15,7 +15,9 @@ import java.util.Objects;
 public class Analyzer {
     public static int computeProportion(List<String> projects) {
         JiraConnector jiraConnector = new JiraConnector();
-        return Math.round(jiraConnector.computeProportion(projects)); //Get proportion as cold start for the projects which aren't bookkeeper and openjpa;
+        int roundedProportion = Math.round(jiraConnector.computeProportion(projects));
+        IO.appendOnLog("Rounded value of proportion computed with cold start is: " + roundedProportion);
+        return roundedProportion; //Get proportion as cold start for the projects which aren't bookkeeper and openjpa;
     }
 
     public static void analyzeProjects(List<String> projects, int proportion) {
@@ -29,6 +31,8 @@ public class Analyzer {
                     Releases releases = jiraConnector.getInfos(project);
                     IO fileWriter = new IO(project);
                     List<RevCommit> commits = GitHubConnector.getCommits(project);
+                    IO.appendOnLog("Start computing software metrics ...");
+
                     GitHubConnector.splitCommitsIntoReleases(commits, releases);
 
                     for (int i = 0; i < releases.getReleaseList().size(); i++) {
@@ -55,8 +59,19 @@ public class Analyzer {
 
                         ComputeMetrics.computeNR(release.getVersionClasses());
                         ComputeMetrics.computeAuthorsNumber(release.getVersionClasses());
+
+                        IO.appendOnLog("Retriving classes with bugs ...");
+                    }
+
+                    BugClassDetector.collectClassesWithBug(releases,commits,project,proportion);
+
+                    for(Release release: releases.getReleaseList()){
                         fileWriter.serializeDataSet(release.getVersionClasses());
                     }
+
+
+
+                    IO.appendOnLog("End computing software metrics");
 
 
                     IO.appendOnLog("\n\t  FINISHED ANALYZING " + project);
@@ -67,22 +82,6 @@ public class Analyzer {
             } catch (IOException | GitAPIException e) {
                 IO.appendOnLog("ERROR: Error in data split");
             }
-        }
-    }
-
-
-
-
-    private static void computeLocProperties(Releases releases, IO fileWriter) {
-        for (Release release: releases.getReleaseList()) {
-            int totalCommit =0;
-            for (ProjectClass projectClass: release.getVersionClasses()) {
-                for (RevCommit commit:projectClass.getCommits()) {
-                    //ComputeMetrics.computeLOCMetrics("C:\\Users\\simon\\ISW2Projects\\projects\\" + fileWriter.getProjectName().toLowerCase(), commit, projectClass);
-                    totalCommit = totalCommit + 1;
-                }
-            }
-            System.out.println("Number of commits for release: " + totalCommit);
         }
     }
 }

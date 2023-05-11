@@ -39,7 +39,7 @@ public class Proportion {
                 OV = release.getReleaseNumber();
             }
         }
-        return (float) (FV-IV)/ (float) (FV-OV); //Smoothing to consider the same version as distance one and therefore consider also tickets when IV = OV
+        return (float) (FV-IV+1)/ (float) (FV-OV+1); //Smoothing to consider the same version as distance one and therefore consider also tickets when IV = OV
 
     }
 
@@ -73,9 +73,50 @@ public class Proportion {
             FV = versions.get(0).getReleaseDate();
         }
 
-        if(IVDate == null || OV.after(FV) || IVDate.after(OV) || IVDate.after(FV) || OV.compareTo(FV) == 0){ //Don't consider FV==OV to apply smoothing
+        if(IVDate == null || OV.after(FV) || IVDate.after(OV) || IVDate.after(FV)){ //Don't consider FV==OV to apply smoothing
             throw new InvalidDataException();
         }
         return new Ticket(OV,FV,IVDate,IV,key);
+    }
+
+    public static Ticket createTicketWithoutProportionAdmissible(Date openingVersionDate, Date fixedVersionDate, int proportionValue, List<Release> versions, String key) throws InvalidDataException {
+        Date OV = openingVersionDate;
+        int OVIndex = 0;
+        int FVIndex = 0;
+        Date IVDate;
+        Date FV = fixedVersionDate;
+
+        for (int i = 1;i<versions.size()-1;i++) { //I don't consider first version as possible fixed version and last version as possible opening version (only resolved tickets)
+            Date currentVersionDate = versions.get(i).getReleaseDate(); //Get the release date of a version
+            if(openingVersionDate.before(currentVersionDate) && openingVersionDate.after(versions.get(i-1).getReleaseDate())){
+                OV = (versions.get(i-1).getReleaseDate());
+                OVIndex = i-1;
+            }
+            if(fixedVersionDate.after(currentVersionDate) && openingVersionDate.before(versions.get(i+1).getReleaseDate())){
+                FV = (versions.get(i+1).getReleaseDate());
+                FVIndex=i+1;
+            }
+        }
+
+        //Get injected version using proportion value
+
+        int IVIndex = FVIndex - (FVIndex - OVIndex) * proportionValue;
+
+        if(IVIndex < 1){
+            IVDate = versions.get(0).getReleaseDate();
+            IVIndex = 1;
+        }else{
+            IVDate = versions.get(IVIndex).getReleaseDate();
+        }
+
+
+        if(FV.compareTo(fixedVersionDate) == 0){
+            FV = versions.get(0).getReleaseDate();
+        }
+
+        if(IVDate == null || OV.after(FV) || IVDate.after(OV) || IVDate.after(FV) || OV.compareTo(FV) == 0){ //Don't consider FV==OV to apply smoothing
+            throw new InvalidDataException();
+        }
+        return new Ticket(OV,FV,IVDate,versions.get(IVIndex).getName(),key);
     }
 }
