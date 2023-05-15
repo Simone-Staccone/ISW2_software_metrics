@@ -74,6 +74,10 @@ public class Analyzer {
                     IO.appendOnLog("End computing software metrics");
 
 
+                    WalkForward.createFiles(releases,project.toLowerCase());
+
+                    IO.appendOnLog("Walk forward applied successfully");
+
                     IO.appendOnLog("\n\t  FINISHED ANALYZING " + project);
                     IO.appendOnLog("******************************************\n");
                 }

@@ -26,12 +26,13 @@ public class IO {
         header.delete(header.length()-1,header.length());
 
         IO.appendOnFile(datasetUrlString, header.toString());
-
-
     }
 
-    public String getUrl(){
-        return this.datasetUrlString;
+    public static void createDirectory(String dir) throws IOException {
+        File directory = new File(dir);
+        if(!directory.exists()){
+            System.out.println(directory.mkdirs() + " " + dir);
+        }
     }
 
     public String getProjectName(){
@@ -43,18 +44,6 @@ public class IO {
             BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
             String jsonText = readAll(rd);
             return new JSONObject(jsonText);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-
-    public static JSONArray readJsonArray(String url)  {
-        try (InputStream is = new URL(url).openStream()) {
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-            String jsonText = readAll(rd);
-            return new JSONArray(jsonText);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -98,15 +87,8 @@ public class IO {
     }
 
     public static void appendOnLog(String whatToWrite){
-        try{
-            String dir = "src" +  File.separator + "main" + File.separator + Initializer.getLogFileName();
-            FileWriter fileWriter = new FileWriter(dir,true);
-            fileWriter.append(whatToWrite).append("\n");
-            fileWriter.flush();
-            fileWriter.close();
-        } catch(IOException i){
-            i.printStackTrace();
-        }
+        String dir = "src" +  File.separator + "main" + File.separator + Initializer.getLogFileName();
+        appendOnFile(dir,whatToWrite);
     }
 
 
@@ -129,7 +111,14 @@ public class IO {
             fileWriter.flush();
             fileWriter.close();
         } catch(IOException i){
-            i.printStackTrace();
+            File directory = new File(dir);
+            if(!directory.exists()){
+                if(!directory.mkdir()) {
+                    i.printStackTrace();
+                }else {
+                    appendOnFile(dir,className);
+                }
+            }
         }
     }
 
@@ -145,8 +134,6 @@ public class IO {
     }
 
     public void serializeDataSet(List<ProjectClass> versionClasses) {
-
-
         for (ProjectClass projectClass: versionClasses) {
             String buggy = projectClass.isBug() ? "Yes" : "No";
 
