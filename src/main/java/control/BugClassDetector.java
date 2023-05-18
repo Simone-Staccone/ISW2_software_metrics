@@ -15,6 +15,7 @@ public class BugClassDetector {
     public static void collectClassesWithBug(Releases releases, List<RevCommit> commits, String projectName, int proportionValue) throws IOException {
         JiraConnector jiraConnector = new JiraConnector();
         List<Ticket> ticketList = jiraConnector.getTickets(projectName,proportionValue,releases);
+
         for (Ticket ticket : ticketList) {
 
             List<RevCommit> commitsAssociatedToTicket = BugClassDetector.filterCommitsAssociatedToTicket(ticket, commits);
@@ -56,5 +57,17 @@ public class BugClassDetector {
         }
 
         return assCommits;
+    }
+
+
+    public static List<Releases> buildWalkForward(String project, Releases allReleases) {
+        List<Releases> newReleases  = new ArrayList<>();
+        for(int i = 1;i<allReleases.getReleaseList().size()+1;i++){
+            JiraConnector jiraConnector = new JiraConnector();
+            newReleases.add(jiraConnector.getInfos(project, String.valueOf(i)));
+        }
+        return newReleases;
+
+
     }
 }

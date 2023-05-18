@@ -18,9 +18,10 @@ import java.util.stream.Stream;
 
 
 public class JiraConnector {
-	private static List<List<String>> getVersionInfo(JSONArray versions){
+	private static List<List<String>> getVersionInfo(JSONArray versions, int num){
 		List<List<String>> entries = new ArrayList<>();
-		for (int i = 0; i < versions.length()/2; i++ ) { //I take only half of the versions
+		int len = Math.min(num, versions.length());//num<versions.length() ? num : versions.length();
+		for (int i = 0; i < len; i++ ) { //I take only half of the versions
 			List<String> entry = new ArrayList<>();
 			if(versions.getJSONObject(i).has("releaseDate") && versions.getJSONObject(i).has("name") && versions.getJSONObject(i).has("id") && versions.getJSONObject(i).getBoolean("released")) { //Considering releases only with date, name and id
 				entry.add(versions.getJSONObject(i).get("id").toString());
@@ -44,7 +45,7 @@ public class JiraConnector {
 			List<Ticket> allAVTickets = new ArrayList<>();
 			float singleProportion;
 			if (!Objects.equals(project, "BOOKKEEPER") && !Objects.equals(project, "OPENJPA")) {
-				Releases versions = getInfos(project);
+				Releases versions = getInfos(project, "all");
 				List<Ticket> ticketList;
 				ticketList = JiraConnector.getTicketsWithAv(project,versions);
 				allAVTickets = Stream.concat(allAVTickets.stream(), ticketList.stream())
@@ -73,14 +74,19 @@ public class JiraConnector {
 		for (float proportion :proportions){
 			finalProportion  = finalProportion + proportion;
 		}
-		System.out.println(prop);
 
 		return prop / 5;
 	}
 
-	public Releases getInfos(String projectName) {
+	public Releases getInfos(String projectName, String number) {
 		JSONObject resultSet = IO.readJsonObject(Initializer.getApiUrl() + projectName); //Get the JSON result from the url to see all the issues
-		return new Releases(getVersionInfo(Objects.requireNonNull(resultSet).getJSONArray("versions")));
+		assert resultSet != null;
+		int num = resultSet.length();
+		if(number.compareTo("all") != 0){
+			num = Integer.parseInt(number);
+		}
+
+		return new Releases(getVersionInfo(resultSet.getJSONArray("versions") , num));
 	}
 
 

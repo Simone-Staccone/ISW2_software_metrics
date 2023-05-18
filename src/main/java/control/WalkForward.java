@@ -3,6 +3,7 @@ package control;
 import model.ProjectClass;
 import model.Release;
 import model.Releases;
+import org.eclipse.jgit.revwalk.RevCommit;
 import utils.IO;
 
 import java.io.File;
@@ -15,32 +16,38 @@ public class WalkForward {
 
     }
 
-    public static void createFiles(Releases releases,String project){
-        List<ProjectClass> allClasses = new ArrayList<>(releases.getReleaseList().get(0).getVersionClasses());
+    public static void createFiles(Releases newReleases, String project, Releases releases) throws IOException {
+        List<ProjectClass> allClasses = new ArrayList<>();
+        List<RevCommit> allCommits = new ArrayList<>();
+        int i;
 
-
-        for (int i = 1;i<releases.getReleaseList().size();i++) {
-            Release release = releases.getReleaseList().get(i);
-            String trainUrl = "src" + File.separator + "main" + File.separator + "data" + File.separator + project.toLowerCase() + File.separator + "Release_" + release.getReleaseNumber() + File.separator + "train";
-            String testUrl = "src" + File.separator + "main" + File.separator + "data" + File.separator + project.toLowerCase() + File.separator + "Release_" + release.getReleaseNumber() + File.separator + "test";
-
-            try {
-                IO.createDirectory(trainUrl);
-                IO.createDirectory(testUrl);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            IO trainWriter = new IO(project.toLowerCase() + File.separator + "Release_" + release.getReleaseNumber() + File.separator + "train");
-
-            IO testWriter = new IO(project.toLowerCase() + File.separator + "Release_" + release.getReleaseNumber() + File.separator + "test");
-            
-
-
-            trainWriter.serializeDataSet(allClasses);
-            testWriter.serializeDataSet(release.getVersionClasses());
-
-            allClasses.addAll(release.getVersionClasses());
-
+        for (i = 0;i<newReleases.getReleaseList().size();i++) {
+            allCommits.addAll(newReleases.getReleaseList().get(i).allCommits);
+            allClasses.addAll(newReleases.getReleaseList().get(i).getVersionClasses());
         }
+
+        BugClassDetector.collectClassesWithBug(newReleases,allCommits,project,2);
+
+
+
+        Release trainRelease = newReleases.getReleaseList().get(i-1);
+        Release testRelease = releases.getReleaseList().get(i);
+
+        String trainUrl = "src" + File.separator + "main" + File.separator + "data" + File.separator + project.toLowerCase() + File.separator + "Release_" + trainRelease.getReleaseNumber() + File.separator + "train";
+        String testUrl = "src" + File.separator + "main" + File.separator + "data" + File.separator + project.toLowerCase() + File.separator + "Release_" + trainRelease.getReleaseNumber() + File.separator + "test";
+
+        try {
+            IO.createDirectory(trainUrl);
+            IO.createDirectory(testUrl);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        IO trainWriter = new IO(project.toLowerCase() + File.separator + "Release_" + trainRelease.getReleaseNumber() + File.separator + "train");
+        IO testWriter = new IO(project.toLowerCase() + File.separator + "Release_" + trainRelease.getReleaseNumber() + File.separator + "test");
+
+        trainWriter.serializeDataSet(allClasses);
+        testWriter.serializeDataSet(testRelease.getVersionClasses());
+
     }
 }

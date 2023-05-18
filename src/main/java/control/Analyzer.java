@@ -28,53 +28,27 @@ public class Analyzer {
                 if (Objects.equals(project, "BOOKKEEPER") || Objects.equals(project, "OPENJPA")) {
                     IO.appendOnLog("******************************************");
                     IO.appendOnLog("\t  START ANALYZING " + project + "\n");
-                    Releases releases = jiraConnector.getInfos(project);
+                    Releases releases = jiraConnector.getInfos(project,"all");
                     IO fileWriter = new IO(project);
                     List<RevCommit> commits = GitHubConnector.getCommits(project);
                     IO.appendOnLog("Start computing software metrics ...");
 
-                    GitHubConnector.splitCommitsIntoReleases(commits, releases);
+                    Analyzer.useCommits(releases,commits, proportion, project, fileWriter);
 
-                    for (int i = 0; i < releases.getReleaseList().size(); i++) {
-                        Map<String, String> versionClasses = GitHubConnector.getClassesForCommit(releases.getReleaseList().get(i).getLastCommit(), project);
-
-                        for (String className : versionClasses.keySet()) {
-                            ProjectClass projectClass = new ProjectClass(i, className, versionClasses.get(className));
-                            releases.getReleaseList().get(i).addProjectClass(projectClass);
-                            GitHubConnector.setFanOut(projectClass);
-                            GitHubConnector.setMethodsNumber(projectClass);
-                        }
-
+                    for(int i = 0; i < releases.getReleaseList().size(); i++){
+                        fileWriter.serializeDataSet(releases.getReleaseList().get(i).getVersionClasses());
                     }
-
-                    GitHubConnector.computeCommitForClass(releases, fileWriter.getProjectName());  //Associate each commit to a projectClass
-
-
-
-                    for(Release release: releases.getReleaseList()){
-                        GitHubConnector.computeLocForClassInRelease(release);
-                        for (ProjectClass projectClass:release.getVersionClasses()) {
-                            GitHubConnector.computeAddedAndDeletedLinesList(projectClass,project);
-                        }
-
-                        ComputeMetrics.computeNR(release.getVersionClasses());
-                        ComputeMetrics.computeAuthorsNumber(release.getVersionClasses());
-
-                        IO.appendOnLog("Retriving classes with bugs ...");
-                    }
-
-                    BugClassDetector.collectClassesWithBug(releases,commits,project,proportion);
-
-                    for(Release release: releases.getReleaseList()){
-                        fileWriter.serializeDataSet(release.getVersionClasses());
-                    }
-
-
 
                     IO.appendOnLog("End computing software metrics");
 
+                    List<Releases> newReleases = BugClassDetector.buildWalkForward(project,releases);
 
-                    WalkForward.createFiles(releases,project.toLowerCase());
+
+                    for(int i = 0;i<newReleases.size()/2 + 1 ;i++){
+                        Analyzer.useCommits(newReleases.get(i), commits,proportion,project,fileWriter);
+                        WalkForward.createFiles(newReleases.get(i),project,releases);
+                        IO.appendOnLog("\nComputed training set for release " + i + "\n");
+                    }
 
                     IO.appendOnLog("Walk forward applied successfully");
 
@@ -85,7 +59,45 @@ public class Analyzer {
 
             } catch (IOException | GitAPIException e) {
                 IO.appendOnLog("ERROR: Error in data split");
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
+
+    private static void useCommits(Releases releases, List<RevCommit> commits, int proportion, String project, IO fileWriter) throws IOException {
+        GitHubConnector.splitCommitsIntoReleases(commits, releases);
+
+        for (int i = 0; i < releases.getReleaseList().size(); i++) {
+            Map<String, String> versionClasses = GitHubConnector.getClassesForCommit(releases.getReleaseList().get(i).getLastCommit(), project);
+
+            for (String className : versionClasses.keySet()) {
+                ProjectClass projectClass = new ProjectClass(i, className, versionClasses.get(className));
+                releases.getReleaseList().get(i).addProjectClass(projectClass);
+                GitHubConnector.setFanOut(projectClass);
+                GitHubConnector.setMethodsNumber(projectClass);
+            }
+
+        }
+
+        GitHubConnector.computeCommitForClass(releases, fileWriter.getProjectName());  //Associate each commit to a projectClass
+
+
+
+        for(int i = 0; i < releases.getReleaseList().size(); i++){
+            GitHubConnector.computeLocForClassInRelease(releases.getReleaseList().get(i));
+            for (ProjectClass projectClass: releases.getReleaseList().get(i).getVersionClasses()) {
+                GitHubConnector.computeAddedAndDeletedLinesList(projectClass,project);
+            }
+
+            ComputeMetrics.computeNR(releases.getReleaseList().get(i).getVersionClasses());
+            ComputeMetrics.computeAuthorsNumber(releases.getReleaseList().get(i).getVersionClasses());
+
+            IO.appendOnLog("Retriving classes with bugs ...");
+        }
+
+
+        BugClassDetector.collectClassesWithBug(releases, commits, project,proportion);
+    }
+
 }

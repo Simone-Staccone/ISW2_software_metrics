@@ -16,6 +16,7 @@ public class Master {
         Analyzer.analyzeProjects(projects, proportion);
 
 
+
         IO.appendOnLog("SOFTWARE METRICS ANALYZER SUCCESSFULLY STOPPED\n");
     }
 }

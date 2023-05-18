@@ -16,16 +16,31 @@ public class IO {
     private final String project;
 
     public IO(String project) {
-        this.datasetUrlString = "C:\\Users\\simon\\ISW2Projects\\Falessi\\src\\main\\data\\" + project + "\\DataSet.csv";
+        this.datasetUrlString = "C:\\Users\\simon\\ISW2Projects\\Falessi\\src\\main\\data\\" + project + "\\DataSet.arff";
         this.project = project;
-        IO.clean(datasetUrlString);
+        IO.clean(datasetUrlString);/*
         StringBuilder header = new StringBuilder();
         for(String s: Initializer.CATEGORIES){
             header.append(s).append(CSV_SEPARATOR);
         }
         header.delete(header.length()-1,header.length());
 
-        IO.appendOnFile(datasetUrlString, header.toString());
+        IO.appendOnFile(datasetUrlString, header.toString());*/
+        IO.appendOnFile(this.datasetUrlString,"@relation " + project);
+        IO.appendOnFile(this.datasetUrlString,"@attribute LOC numeric");
+        IO.appendOnFile(this.datasetUrlString,"@attribute LOC_ADDED numeric");
+        IO.appendOnFile(this.datasetUrlString,"@attribute LOC_DELETED numeric");
+        IO.appendOnFile(this.datasetUrlString,"@attribute N_AUTH numeric");
+        IO.appendOnFile(this.datasetUrlString,"@attribute NR numeric");
+        IO.appendOnFile(this.datasetUrlString,"@attribute MAX_LOC_ADDED numeric");
+        IO.appendOnFile(this.datasetUrlString,"@attribute AVG_LOC_ADDED numeric");
+        IO.appendOnFile(this.datasetUrlString,"@attribute CHURN numeric");
+        IO.appendOnFile(this.datasetUrlString,"@attribute MAX_CHURN numeric");
+        IO.appendOnFile(this.datasetUrlString,"@attribute AVG_CHURN numeric");
+        IO.appendOnFile(this.datasetUrlString,"@attribute FAN_OUT numeric");
+        IO.appendOnFile(this.datasetUrlString,"@attribute METHOD_COMPLEXITY numeric");
+        IO.appendOnFile(this.datasetUrlString,"@attribute IS_BUGGY {'Yes', 'No'}");
+        IO.appendOnFile(this.datasetUrlString,"@data");
     }
 
     public static void createDirectory(String dir) throws IOException {
@@ -138,9 +153,7 @@ public class IO {
             String buggy = projectClass.isBug() ? "Yes" : "No";
 
             IO.appendOnFile(this.datasetUrlString,
-                    projectClass.getRelease() +
-                            "," + projectClass.getName() +
-                            "," + projectClass.getLoc() +
+                            projectClass.getLoc() +
                             "," + projectClass.getLocAdded() +
                             "," + projectClass.getLocDeleted() +
                             "," + projectClass.getnAuth() +
