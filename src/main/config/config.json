@@ -3,7 +3,6 @@
     "BOOKKEEPER",
     "AVRO",
     "OPENJPA",
-    "STORM",
     "ZOOKEEPER",
     "SYNCOPE",
     "TAJO"

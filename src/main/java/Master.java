@@ -12,7 +12,7 @@ public class Master {
         List<String> projects = init.getProjectNames();
         IO.appendOnLog("STARTING SOFTWARE METRICS ANALYZER\n");
 
-        int proportion = 2;//Analyzer.computeProportion(projects);
+        int proportion = Analyzer.computeProportion(projects);
         Analyzer.analyzeProjects(projects, proportion);
 
 

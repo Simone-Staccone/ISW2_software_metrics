@@ -27,20 +27,22 @@ public class Proportion {
         int OV = 1;
         int FV = 1;
         int IV = 1;
+        int count = 1;
 
         for(Release release:releases.getReleaseList()){
             if(ticket.injectedVersionDate().compareTo(release.getReleaseDate()) == 0){
-                IV = release.getReleaseNumber();
+                IV = count;
             }
             if(ticket.fixedVersionDate().compareTo(release.getReleaseDate()) == 0){
-                FV = release.getReleaseNumber();
+                FV = count;
             }
             if(ticket.openingVersionDate().compareTo(release.getReleaseDate()) == 0){
-                OV = release.getReleaseNumber();
+                OV = count;
             }
+            count++;
         }
-        return (float) (FV-IV+1)/ (float) (FV-OV+1); //Smoothing to consider the same version as distance one and therefore consider also tickets when IV = OV
 
+        return (float) (FV-IV+1)/ (float) (FV-OV+1); //Smoothing to consider the same version as distance one and therefore consider also tickets when IV = OV
     }
 
     public static Ticket createTicket(Date openingVersionDate, Date fixedVersionDate, JSONArray injectedVersion, List<Release> versions, String key) throws InvalidDataException {
@@ -48,17 +50,19 @@ public class Proportion {
         String IV = injectedVersion.getJSONObject(0).getString("name");
         Date IVDate = null;
         Date FV = fixedVersionDate;
+        boolean flagIV = false;
 
         for (int i = 1;i<versions.size()-1;i++) { //I don't consider first version as possible fixed version and last version as possible opening version (only resolved tickets)
             Date currentVersionDate = versions.get(i).getReleaseDate(); //Get the release date of a version
             if(openingVersionDate.before(currentVersionDate) && openingVersionDate.after(versions.get(i-1).getReleaseDate())){
-                OV = (versions.get(i-1).getReleaseDate());
+                OV = (versions.get(i).getReleaseDate());
             }
-            if(fixedVersionDate.after(currentVersionDate) && openingVersionDate.before(versions.get(i+1).getReleaseDate())){
+            if(fixedVersionDate.after(currentVersionDate) && fixedVersionDate.before(versions.get(i+1).getReleaseDate())){
                 FV = (versions.get(i+1).getReleaseDate());
             }
-            if(IV.equals(versions.get(i).getName())){
+            if(!flagIV && IV.equals(versions.get(i).getName())){
                 IVDate = versions.get(i).getReleaseDate();
+                flagIV = true;
             }
         }
 
@@ -69,13 +73,29 @@ public class Proportion {
         }
 
 
-        if(FV.compareTo(fixedVersionDate) == 0){
+        if(fixedVersionDate.before(versions.get(versions.size()-1).getReleaseDate()) && versions.size() > 1 && fixedVersionDate.after(versions.get(versions.size()-2).getReleaseDate())){
+            FV = versions.get(versions.size()-1).getReleaseDate();
+        }else if(FV.compareTo(fixedVersionDate) == 0){
             FV = versions.get(0).getReleaseDate();
+        }
+        if(fixedVersionDate.after(versions.get(versions.size()-1).getReleaseDate())){ //Do not consider if opening > last release date
+            throw new InvalidDataException();
+        }
+
+
+        if(openingVersionDate.before(versions.get(versions.size()-1).getReleaseDate()) && versions.size() > 1 && openingVersionDate.after(versions.get(versions.size()-2).getReleaseDate())){
+            OV = versions.get(versions.size()-1).getReleaseDate();
+        }else if(OV.compareTo(openingVersionDate) == 0){
+            OV = versions.get(0).getReleaseDate();
+        }
+        if(openingVersionDate.after(versions.get(versions.size()-1).getReleaseDate())){ //Do not consider if opening > last release date
+            throw new InvalidDataException();
         }
 
         if(IVDate == null || OV.after(FV) || IVDate.after(OV) || IVDate.after(FV)){ //Don't consider FV==OV to apply smoothing
             throw new InvalidDataException();
         }
+
         return new Ticket(OV,FV,IVDate,IV,key);
     }
 
@@ -85,6 +105,7 @@ public class Proportion {
         int FVIndex = 0;
         Date IVDate;
         Date FV = fixedVersionDate;
+
 
         for (int i = 1;i<versions.size()-1;i++) { //I don't consider first version as possible fixed version and last version as possible opening version (only resolved tickets)
             Date currentVersionDate = versions.get(i).getReleaseDate(); //Get the release date of a version
@@ -98,13 +119,40 @@ public class Proportion {
             }
         }
 
+
+        if(fixedVersionDate.before(versions.get(versions.size()-1).getReleaseDate()) && versions.size() > 1 && fixedVersionDate.after(versions.get(versions.size()-2).getReleaseDate())){
+            FV = versions.get(versions.size()-1).getReleaseDate();
+            FVIndex = versions.size()-1;
+        }else if(FV.compareTo(fixedVersionDate) == 0){
+            FV = versions.get(0).getReleaseDate();
+        }
+        if(fixedVersionDate.after(versions.get(versions.size()-1).getReleaseDate())){ //Do not consider if opening > last release date
+            throw new InvalidDataException();
+        }
+
+
+        if(openingVersionDate.before(versions.get(versions.size()-1).getReleaseDate()) && versions.size() > 1 && openingVersionDate.after(versions.get(versions.size()-2).getReleaseDate())){
+            OV = versions.get(versions.size()-1).getReleaseDate();
+            OVIndex = versions.size()-1;
+        }else if(OV.compareTo(openingVersionDate) == 0){
+            OV = versions.get(0).getReleaseDate();
+        }
+        if(openingVersionDate.after(versions.get(versions.size()-1).getReleaseDate())){ //Do not consider if opening > last release date
+            throw new InvalidDataException();
+        }
+
+
+
         //Get injected version using proportion value
 
         int IVIndex = FVIndex - (FVIndex - OVIndex) * proportionValue;
 
         if(IVIndex < 1){
             IVDate = versions.get(0).getReleaseDate();
-            IVIndex = 1;
+            IVIndex = 0;
+        }else if(IVIndex == FVIndex){
+            IVIndex = FVIndex - 1;
+            IVDate = versions.get(IVIndex).getReleaseDate();
         }else{
             IVDate = versions.get(IVIndex).getReleaseDate();
         }
@@ -114,9 +162,15 @@ public class Proportion {
             FV = versions.get(0).getReleaseDate();
         }
 
-        if(IVDate == null || OV.after(FV) || IVDate.after(OV) || IVDate.after(FV) || OV.compareTo(FV) == 0){ //Don't consider FV==OV to apply smoothing
-            throw new InvalidDataException();
+        if(IVDate == null || OV.after(FV) || IVDate.after(OV) || IVDate.after(FV)){ //Don't consider FV==OV
+            if(versions.get(IVIndex-1).getReleaseDate().before(FV)){ //When releases aren't ordered by date
+                IVDate = versions.get(IVIndex-1).getReleaseDate();
+                IVIndex = IVIndex -1;
+            }else{
+                throw new InvalidDataException();
+            }
         }
+
         return new Ticket(OV,FV,IVDate,versions.get(IVIndex).getName(),key);
     }
 }

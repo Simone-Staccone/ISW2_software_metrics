@@ -15,7 +15,7 @@ import java.util.Objects;
 public class Analyzer {
     public static int computeProportion(List<String> projects) {
         JiraConnector jiraConnector = new JiraConnector();
-        int roundedProportion = Math.round(jiraConnector.computeProportion(projects));
+        int roundedProportion = 2;//Math.round(jiraConnector.computeProportion(projects));
         IO.appendOnLog("Rounded value of proportion computed with cold start is: " + roundedProportion);
         return roundedProportion; //Get proportion as cold start for the projects which aren't bookkeeper and openjpa;
     }
@@ -29,7 +29,7 @@ public class Analyzer {
                     IO.appendOnLog("******************************************");
                     IO.appendOnLog("\t  START ANALYZING " + project + "\n");
                     Releases releases = jiraConnector.getInfos(project,"all");
-                    IO fileWriter = new IO(project);
+                    /*IO fileWriter = new IO(project);
                     List<RevCommit> commits = GitHubConnector.getCommits(project);
                     IO.appendOnLog("Start computing software metrics ...");
 
@@ -44,13 +44,16 @@ public class Analyzer {
                     List<Releases> newReleases = BugClassDetector.buildWalkForward(project,releases);
 
 
-                    for(int i = 0;i<newReleases.size()/2 + 1 ;i++){
+                    for(int i = 0;i<newReleases.size()/2 + 2 ;i++){
                         Analyzer.useCommits(newReleases.get(i), commits,proportion,project,fileWriter);
                         WalkForward.createFiles(newReleases.get(i),project,releases);
                         IO.appendOnLog("\nComputed training set for release " + i + "\n");
                     }
 
                     IO.appendOnLog("Walk forward applied successfully");
+*/
+
+                    WekaApi.compute(project,releases);
 
                     IO.appendOnLog("\n\t  FINISHED ANALYZING " + project);
                     IO.appendOnLog("******************************************\n");

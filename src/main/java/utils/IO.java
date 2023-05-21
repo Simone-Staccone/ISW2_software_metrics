@@ -1,31 +1,25 @@
 package utils;
 
 import model.ProjectClass;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.*;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 
 public class IO {
     private static final String CSV_SEPARATOR = ",";
+    private static final String CSV_SEPARATOR_2 = ";";
     private final String datasetUrlString;
     private final String project;
 
     public IO(String project) {
         this.datasetUrlString = "C:\\Users\\simon\\ISW2Projects\\Falessi\\src\\main\\data\\" + project + "\\DataSet.arff";
         this.project = project;
-        IO.clean(datasetUrlString);/*
-        StringBuilder header = new StringBuilder();
-        for(String s: Initializer.CATEGORIES){
-            header.append(s).append(CSV_SEPARATOR);
-        }
-        header.delete(header.length()-1,header.length());
-
-        IO.appendOnFile(datasetUrlString, header.toString());*/
+        IO.clean(datasetUrlString);
         IO.appendOnFile(this.datasetUrlString,"@relation " + project);
         IO.appendOnFile(this.datasetUrlString,"@attribute LOC numeric");
         IO.appendOnFile(this.datasetUrlString,"@attribute LOC_ADDED numeric");
@@ -43,6 +37,18 @@ public class IO {
         IO.appendOnFile(this.datasetUrlString,"@data");
     }
 
+    public IO(String project, boolean csv) throws Exception {
+        if(!csv){
+            throw new Exception();
+        }
+        this.datasetUrlString = "C:\\Users\\simon\\ISW2Projects\\Falessi\\src\\main\\data\\" + project + "\\WekaReport.csv";
+        this.project = project;
+        IO.clean(datasetUrlString);
+        IO.appendOnFile(this.datasetUrlString,"classifier;iteration;precision;recall;RC;kappa;");
+    }
+
+
+
     public static void createDirectory(String dir) throws IOException {
         File directory = new File(dir);
         if(!directory.exists()){
@@ -55,11 +61,12 @@ public class IO {
     }
 
     public static JSONObject readJsonObject(String url)  {
-        try (InputStream is = new URL(url).openStream()) {
+        try (InputStream is = new URI(url).toURL().openStream()) {
             BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
             String jsonText = readAll(rd);
+            is.close();
             return new JSONObject(jsonText);
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
         return null;
@@ -169,6 +176,18 @@ public class IO {
             );
         }
 
+
+    }
+
+    public void serializeDataSetOnCsv(int iteration, String classifier, double precision, double recall, double rc, double kappa) {
+        IO.appendOnFile(this.datasetUrlString,
+                classifier +
+                        CSV_SEPARATOR_2 + iteration +
+                        CSV_SEPARATOR_2 + precision +
+                        CSV_SEPARATOR_2 + recall +
+                        CSV_SEPARATOR_2 + rc +
+                        CSV_SEPARATOR_2 + kappa
+        );
 
     }
 }

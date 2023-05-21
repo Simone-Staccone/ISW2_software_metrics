@@ -35,28 +35,30 @@ public class JiraConnector {
 	}
 
 	public float computeProportion(List<String> projects) {
-		List<Float> proportions = new ArrayList<>();
+		//List<Float> proportions = new ArrayList<>();
 		float prop = 0;
 		int totalSize = 0;
 		IO.appendOnLog("Computing proportion with cold start ...");
 
-		int i = 0;
+		int i = 1;
 		for (String project : projects) {
-			List<Ticket> allAVTickets = new ArrayList<>();
+			System.out.println(project.toUpperCase());
+			//List<Ticket> allAVTickets = new ArrayList<>();
 			float singleProportion;
 			if (!Objects.equals(project, "BOOKKEEPER") && !Objects.equals(project, "OPENJPA")) {
 				Releases versions = getInfos(project, "all");
 				List<Ticket> ticketList;
 				ticketList = JiraConnector.getTicketsWithAv(project,versions);
-				allAVTickets = Stream.concat(allAVTickets.stream(), ticketList.stream())
+				System.out.println(versions.getReleaseList().size());
+				/*allAVTickets = Stream.concat(allAVTickets.stream(), ticketList.stream())
 						.distinct()
-						.collect(Collectors.toList());
-				singleProportion = Proportion.coldStart(allAVTickets, versions); //Compute proportion for each project
+						.collect(Collectors.toList());*/
+				singleProportion = Proportion.coldStart(ticketList, versions); //Compute proportion for each project
 				prop = prop + singleProportion;//*allAVTickets.size();  //Weighted avarege
-				proportions.add(singleProportion);
+				//proportions.add(singleProportion);
 
-				totalSize = totalSize + allAVTickets.size();
-				IO.appendOnLog("Proportion computed for project " + project + " is: " + proportions.get(i) + " number of tickets: " + ticketList.size());
+				//totalSize = totalSize + allAVTickets.size();
+				IO.appendOnLog("Proportion computed for project " + project + " is: " + singleProportion + " number of tickets: " + ticketList.size());
 				i++;
 			}
 
@@ -67,21 +69,13 @@ public class JiraConnector {
 		IO.appendOnLog("Proportion value computed with cold start is: " + prop / 5);
 		IO.appendOnLog("Proportion successfully acquired\n");
 
-
-		float finalProportion = 0;
-
-
-		for (float proportion :proportions){
-			finalProportion  = finalProportion + proportion;
-		}
-
-		return prop / 5;
+		return prop / i;
 	}
 
 	public Releases getInfos(String projectName, String number) {
 		JSONObject resultSet = IO.readJsonObject(Initializer.getApiUrl() + projectName); //Get the JSON result from the url to see all the issues
 		assert resultSet != null;
-		int num = resultSet.length();
+		int num = resultSet.getJSONArray("versions").length();
 		if(number.compareTo("all") != 0){
 			num = Integer.parseInt(number);
 		}
@@ -110,16 +104,13 @@ public class JiraConnector {
 				assert openingVersionDate != null;
 				assert fixedVersionDate != null;
 
-				if(openingVersionDate.before(versions.getLatestRelease().getReleaseDate()) //Add only if fixed version and opening version are both located before last release with a date
-						&& fixedVersionDate.before(versions.getLatestRelease().getReleaseDate())
-						&& openingVersionDate.before(fixedVersionDate)){ //Don't consider tickets with wrong dates
-					try {
-						ticketList.add(Proportion.createTicket(openingVersionDate,fixedVersionDate,injectedVersions,versions.getReleaseList(),key));
-					} catch (InvalidDataException ignored) {
-					}
+				try {
+					ticketList.add(Proportion.createTicket(openingVersionDate,fixedVersionDate,injectedVersions,versions.getReleaseList(),key));
+				} catch (InvalidDataException ignored) {
 				}
 			}
 		}
+
 
 		return ticketList;
 	}
@@ -130,28 +121,28 @@ public class JiraConnector {
 				+ Initializer.getSearchUrlSecondHalf()); //Get the JSON result from the url to see all the issues
 		List<Ticket> ticketList = new ArrayList<>();
 
-		for (int i = 0; i< Objects.requireNonNull(secondResultSet).getJSONArray("issues").length(); i++) {
+
+		for (int i = 0; i < Objects.requireNonNull(secondResultSet).getJSONArray("issues").length(); i++) {
 			JSONObject fields = secondResultSet.getJSONArray("issues").getJSONObject(i).getJSONObject("fields");
 			String key = secondResultSet.getJSONArray("issues").getJSONObject(i).getString("key");
-			Date openingVersionDate = DateParser.parseStringToDate(fields.getString("created").substring(0,ConstantNames.FORMATTING_STRING.length())); //While parsing, I intentionally lose information about hour and minutes of the ticket
-			Date fixedVersionDate = DateParser.parseStringToDate(fields.getString("resolutiondate").substring(0,ConstantNames.FORMATTING_STRING.length()));
+			Date openingVersionDate = DateParser.parseStringToDate(fields.getString("created").substring(0, ConstantNames.FORMATTING_STRING.length())); //While parsing, I intentionally lose information about hour and minutes of the ticket
+			Date fixedVersionDate = DateParser.parseStringToDate(fields.getString("resolutiondate").substring(0, ConstantNames.FORMATTING_STRING.length()));
 
 			assert openingVersionDate != null;
 			assert fixedVersionDate != null;
 
-			if (openingVersionDate.before(versions.getLatestRelease().getReleaseDate()) //Add only if fixed version and opening version are both located before last release with a date
-					&& fixedVersionDate.before(versions.getLatestRelease().getReleaseDate())
-					&& openingVersionDate.before(fixedVersionDate)) { //Don't consider tickets with wrong dates
-				try {
-					if (fields.getJSONArray("versions").length() != 0) { //Check only tickets with injected version
-						JSONArray injectedVersions = fields.getJSONArray("versions");
-						ticketList.add(Proportion.createTicket(openingVersionDate, fixedVersionDate, injectedVersions, versions.getReleaseList(), key));
-					} else {
-						ticketList.add(Proportion.createTicketWithoutProportionAdmissible(openingVersionDate, fixedVersionDate, proportionValue, versions.getReleaseList(), key));
-					}
-				} catch (InvalidDataException ignored) {
+			try {
+				if (fields.getJSONArray("versions").length() != 0) { //Check only tickets with injected version
+
+					JSONArray injectedVersions = fields.getJSONArray("versions");
+					ticketList.add(Proportion.createTicket(openingVersionDate, fixedVersionDate, injectedVersions, versions.getReleaseList(), key));
+				} else {
+					ticketList.add(Proportion.createTicketWithoutProportionAdmissible(openingVersionDate, fixedVersionDate, proportionValue, versions.getReleaseList(), key));
 				}
+			} catch (InvalidDataException ignored) {
 			}
+
+
 		}
 		return ticketList;
 	}

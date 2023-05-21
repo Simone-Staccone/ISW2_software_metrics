@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<a:project xmlns:a="http://maven.apache.org/POM/4.0.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <a:modelVersion>4.0.0</a:modelVersion>
 
-    <groupId>org.example</groupId>
-    <artifactId>Data Retrival</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <dependencies>
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>RELEASE</version>
-            <scope>compile</scope>
-        </dependency>
-    </dependencies>
+    <a:groupId>org.example</a:groupId>
+    <a:artifactId>Data Retrival</a:artifactId>
+    <a:version>1.0-SNAPSHOT</a:version>
+    <a:dependencies>
+        <a:dependency>
+            <a:groupId>org.jetbrains</a:groupId>
+            <a:artifactId>annotations</a:artifactId>
+            <a:version>RELEASE</a:version>
+            <a:scope>compile</a:scope>
+        </a:dependency>
+    </a:dependencies>
 
-    <properties>
-        <maven.compiler.source>20</maven.compiler.source>
-        <maven.compiler.target>20</maven.compiler.target>
-    </properties>
+    <a:properties>
+        <a:maven.compiler.source>20</a:maven.compiler.source>
+        <a:maven.compiler.target>20</a:maven.compiler.target>
+    </a:properties>
 
-</project>
+</a:project>

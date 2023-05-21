@@ -11,7 +11,13 @@ public class Releases {
     private Release latestRelease;
 
     public Releases(List<List<String>> entries){
-        Date latestReleaseDate = DateParser.parseStringToDate(entries.get(0).get(2));  //Initialize the last date to the first of the list
+        Date latestReleaseDate = DateParser.parseStringToDate(entries.get(entries.size()-1).get(2));  //Initialize the last date to the first of the list
+        latestRelease = new Release(Integer.parseInt(entries.get(0).get(0)),
+                entries.get(0).get(1),
+                DateParser.parseStringToDate(entries.get(0).get(2)),
+                null,
+                Integer.parseInt(entries.get(0).get(3)) + 1);
+
         for (List<String> entry:entries) {
             Release release = new Release(Integer.parseInt(entry.get(0)),
                     entry.get(1),

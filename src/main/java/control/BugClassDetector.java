@@ -39,7 +39,7 @@ public class BugClassDetector {
     private static void labelClasses(List<ProjectClass> classes, String className, Ticket ticket, Date releaseDate) {
         for (ProjectClass projectClass : classes) {
             if (projectClass.getName().equals(className)
-                    && !ticket.injectedVersionDate().after(releaseDate)
+                    && ( releaseDate.after(ticket.injectedVersionDate()) || releaseDate.compareTo(ticket.injectedVersionDate()) == 0)
                     && releaseDate.before(ticket.fixedVersionDate()) ){
                 projectClass.setBug(true);
             }
