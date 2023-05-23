@@ -13,8 +13,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 
 
 public class JiraConnector {
@@ -49,7 +48,7 @@ public class JiraConnector {
 				Releases versions = getInfos(project, "all");
 				List<Ticket> ticketList;
 				ticketList = JiraConnector.getTicketsWithAv(project,versions);
-				System.out.println(versions.getReleaseList().size());
+
 				/*allAVTickets = Stream.concat(allAVTickets.stream(), ticketList.stream())
 						.distinct()
 						.collect(Collectors.toList());*/
@@ -80,7 +79,7 @@ public class JiraConnector {
 			num = Integer.parseInt(number);
 		}
 
-		return new Releases(getVersionInfo(resultSet.getJSONArray("versions") , num));
+		return new Releases(getVersionInfo(resultSet.getJSONArray("versions") , num+1));
 	}
 
 

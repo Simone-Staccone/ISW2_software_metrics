@@ -183,10 +183,10 @@ public class IO {
         IO.appendOnFile(this.datasetUrlString,
                 classifier +
                         CSV_SEPARATOR_2 + iteration +
-                        CSV_SEPARATOR_2 + precision +
-                        CSV_SEPARATOR_2 + recall +
-                        CSV_SEPARATOR_2 + rc +
-                        CSV_SEPARATOR_2 + kappa
+                        CSV_SEPARATOR_2 + String.valueOf(precision).replace(".",",") +
+                        CSV_SEPARATOR_2 + String.valueOf(recall).replace(".",",") +
+                        CSV_SEPARATOR_2 + String.valueOf(rc).replace(".",",") +
+                        CSV_SEPARATOR_2 + String.valueOf(kappa).replace(".",",")
         );
 
     }

@@ -2,12 +2,18 @@ package control;
 
 import model.Releases;
 import utils.IO;
+import weka.attributeSelection.BestFirst;
+import weka.attributeSelection.CfsSubsetEval;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.lazy.IBk;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
+import weka.core.Utils;
 import weka.core.converters.ConverterUtils.DataSource;
+import weka.filters.supervised.instance.*;
+import weka.filters.Filter;
+import weka.filters.supervised.attribute.AttributeSelection;
 
 import java.io.File;
 import java.util.Arrays;
@@ -19,8 +25,11 @@ public class WekaApi {
         IO fileWriter = new IO(projectName,true);
 
         for(int i = 0;i<releases.getReleaseList().size();i++){
-            String trainUrl = "src" + File.separator + "main" + File.separator + "data" + File.separator + projectName.toLowerCase() + File.separator + "Release_" + releases.getReleaseList().get(i).getReleaseNumber() + File.separator + "train";
-            String testUrl = "src" + File.separator + "main" + File.separator + "data" + File.separator + projectName.toLowerCase() + File.separator + "Release_" + releases.getReleaseList().get(i).getReleaseNumber() + File.separator + "test";
+            System.out.println("\nITERATION " + i + "\n");
+
+
+            String trainUrl = "src" + File.separator + "main" + File.separator + "data" + File.separator + projectName.toLowerCase() + File.separator + "Release_" + (i+1) + File.separator + "train";
+            String testUrl = "src" + File.separator + "main" + File.separator + "data" + File.separator + projectName.toLowerCase() + File.separator + "Release_" + (i+1) + File.separator + "test";
 
             System.out.println(trainUrl);
             System.out.println(testUrl);
@@ -31,65 +40,94 @@ public class WekaApi {
             Instances trainData = trainSource.getDataSet();
             Instances testData = testSource.getDataSet();
 
+            System.out.println("Testing size: " + testData.size());
+
             trainData.setClassIndex(trainData.numAttributes() - 1);
             testData.setClassIndex(trainData.numAttributes() - 1);
 
             Evaluation eval = new Evaluation(trainData);
 
+            ibkClassifier(i,trainData,testData,eval,fileWriter);
+
+            eval = new Evaluation(trainData);
 
             NBClassification(i,trainData, testData, eval,fileWriter);
 
-            ibkClassifier(i,trainData,testData,eval,fileWriter);
+            eval = new Evaluation(trainData);
 
             randomForestClassifier(i,trainData,testData,eval,fileWriter);
 
 
+            System.out.println("\nFEATURE SELECTION\n");
+
+            AttributeSelection filter = new AttributeSelection();
+            CfsSubsetEval cfsSubsetEval = new CfsSubsetEval();
 
 
-            /*
-            String trainUrl = "src" + File.separator + "main" + File.separator + "data" + File.separator + projectName.toLowerCase() + File.separator + "Release_" + releases.getReleaseList().get(i).getReleaseNumber() + File.separator + "train";
-            String testUrl = "src" + File.separator + "main" + File.separator + "data" + File.separator + projectName.toLowerCase() + File.separator + "Release_" + releases.getReleaseList().get(i).getReleaseNumber() + File.separator + "test";
-
-            System.out.println(trainUrl  + File.separator + "DataSet.arff");
-            System.out.println(testUrl + File.separator +  "DataSet.arff");
-
-            DataSource source1 = new DataSource(trainUrl  + File.separator + "DataSet.arff");
-            DataSource source2 = new DataSource(testUrl + File.separator +  "DataSet.arff");
-            Instances trainingDataSet = source1.getDataSet();
-            Instances testingDataSet = source2.getDataSet();
-
-            trainingDataSet.setClassIndex(trainingDataSet.numAttributes() - 1);
-            testingDataSet.setClassIndex(testingDataSet.numAttributes() - 1);
-
-            System.out.println(trainingDataSet.size());
-
-            RandomForest randomForestClassifier = new RandomForest();
-            NaiveBayes naiveBayesClassifier = new NaiveBayes();
-            IBk ibkClassifier = new IBk();
+            BestFirst bestFirst = new BestFirst();
+            bestFirst.setOptions(Utils.splitOptions("-D -1")); //-1 backward, 0 bidirectional, 1 forward
+            filter.setEvaluator(cfsSubsetEval);
+            filter.setSearch(bestFirst);
+            filter.setInputFormat(trainData);
 
 
-            Evaluation eval = new Evaluation(trainingDataSet);
+            Instances filteredTrainingData = Filter.useFilter(trainData, filter);
+            filteredTrainingData.setClassIndex(filteredTrainingData.numAttributes() - 1);
+            Instances filteredTestingData = Filter.useFilter(testData, filter);
+            filteredTestingData.setClassIndex(filteredTestingData.numAttributes() - 1);
 
-//            randomForestClassifier.buildClassifier(trainingDataSet);
-//            eval.evaluateModel(randomForestClassifier, testingDataSet);
-//
-//
-//            System.out.println(Arrays.deepToString(eval.confusionMatrix()));
-//            System.out.println(eval.precision(0) + " " + eval.recall(0) + " " + eval.kappa() + " " + eval.areaUnderROC(0));
-//
-//
-//            naiveBayesClassifier.buildClassifier(trainingDataSet);
-//            eval.evaluateModel(naiveBayesClassifier, testingDataSet);
-//
-//            System.out.println(eval.precision(0) + " " + eval.recall(0) + " " + eval.kappa() + " " + eval.areaUnderROC(0));
-//
+            eval = new Evaluation(filteredTrainingData);
+            NBClassification(i,filteredTrainingData, filteredTestingData, eval,fileWriter);
+            eval = new Evaluation(filteredTrainingData);
+            ibkClassifier(i,filteredTrainingData,filteredTestingData,eval,fileWriter);
+            eval = new Evaluation(filteredTrainingData);
+            randomForestClassifier(i,filteredTrainingData,filteredTestingData,eval,fileWriter);
 
 
-            ibkClassifier.buildClassifier(trainingDataSet);
-            eval.evaluateModel(ibkClassifier, testingDataSet);
+            System.out.println("\nUNDER SAMPLING AFTER FEATURE SELECTION\n");
 
-            System.out.println(eval.precision(0) + " " + eval.recall(0) + " " + eval.kappa() + " " + eval.areaUnderROC(0));
-*/
+            Filter resampleUnder = new Resample();
+            resampleUnder.setOptions(Utils.splitOptions("-B 1.0 -Z 69.8 -no-replacement")); //options for under-sampling
+            //resample.setOptions(Utils.splitOptions("-M 1.0")); //options for over-sampling
+            resampleUnder.setInputFormat(filteredTrainingData);
+
+            Instances filteredTrainingDataU = Filter.useFilter(filteredTrainingData, resampleUnder);
+            filteredTrainingDataU.setClassIndex(filteredTrainingData.numAttributes() - 1);
+            Instances filteredTestingDataU = Filter.useFilter(filteredTestingData, resampleUnder);
+            filteredTestingDataU.setClassIndex(filteredTestingData.numAttributes() - 1);
+
+            eval = new Evaluation(filteredTrainingDataU);
+            NBClassification(i,filteredTrainingDataU, filteredTestingDataU, eval,fileWriter);
+            eval = new Evaluation(filteredTrainingDataU);
+            ibkClassifier(i,filteredTrainingDataU,filteredTestingDataU,eval,fileWriter);
+            eval = new Evaluation(filteredTrainingDataU);
+            randomForestClassifier(i,filteredTrainingDataU,filteredTestingDataU,eval,fileWriter);
+
+            System.out.println("\nOVER SAMPLING AFTER FEATURE SELECTION\n");
+
+            Filter resampleOver = new Resample();
+            resampleOver.setOptions(Utils.splitOptions("-M 1.0")); //options for over-sampling
+            resampleOver.setInputFormat(filteredTrainingData);
+
+            Instances filteredTrainingDataO = Filter.useFilter(filteredTrainingData, resampleOver);
+            filteredTrainingDataO.setClassIndex(filteredTrainingData.numAttributes() - 1);
+            Instances filteredTestingDataO = Filter.useFilter(filteredTestingData, resampleOver);
+            filteredTestingDataO.setClassIndex(filteredTestingData.numAttributes() - 1);
+
+            eval = new Evaluation(filteredTrainingDataO);
+            NBClassification(i,filteredTrainingDataO, filteredTestingDataO, eval,fileWriter);
+            eval = new Evaluation(filteredTrainingDataO);
+            ibkClassifier(i,filteredTrainingDataO,filteredTestingDataO,eval,fileWriter);
+            eval = new Evaluation(filteredTrainingDataO);
+            randomForestClassifier(i,filteredTrainingDataO,filteredTestingDataO,eval,fileWriter);
+
+
+            System.out.println("\nSMOTE AFTER FEATURE SELECTION\n");
+
+            /*SMOT TODO*/
+            resampleOver.setInputFormat(filteredTrainingData);
+
+
 
         }
 
@@ -120,6 +158,14 @@ public class WekaApi {
     private static void ibkClassifier(int i, Instances train, Instances test, Evaluation eval, IO fileWriter) throws Exception {
         IBk iBk = new IBk();
         iBk.buildClassifier(train);
+        iBk.setKNN(1);
+        iBk.setBatchSize(String.valueOf(100));
+        iBk.setCrossValidate(false);
+        iBk.setDebug(false);
+        iBk.setDoNotCheckCapabilities(false);
+        iBk.setMeanSquared(false);
+        iBk.setNumDecimalPlaces(2);
+        iBk.setWindowSize(0);
 
         // evaluation
         eval.evaluateModel(iBk, test);

@@ -30,11 +30,19 @@ public class WalkForward {
 
 
 
-        Release trainRelease = newReleases.getReleaseList().get(i-1);
-        Release testRelease = releases.getReleaseList().get(i);
+        Release trainRelease = newReleases.getReleaseList().get(newReleases.getReleaseList().size()-1);
+        Release testRelease = releases.getReleaseList().get(newReleases.getReleaseList().size());
 
-        String trainUrl = "src" + File.separator + "main" + File.separator + "data" + File.separator + project.toLowerCase() + File.separator + "Release_" + trainRelease.getReleaseNumber() + File.separator + "train";
-        String testUrl = "src" + File.separator + "main" + File.separator + "data" + File.separator + project.toLowerCase() + File.separator + "Release_" + trainRelease.getReleaseNumber() + File.separator + "test";
+
+        int j = 0;
+        for(ProjectClass projectClass:testRelease.getVersionClasses()){
+            if(projectClass.isBug())
+                j++;
+        };
+        System.out.println(j);
+
+        String trainUrl = "src" + File.separator + "main" + File.separator + "data" + File.separator + project.toLowerCase() + File.separator + "Release_" + (i+1) + File.separator + "train";
+        String testUrl = "src" + File.separator + "main" + File.separator + "data" + File.separator + project.toLowerCase() + File.separator + "Release_" + (i+1) + File.separator + "test";
 
         try {
             IO.createDirectory(trainUrl);
@@ -43,8 +51,8 @@ public class WalkForward {
             e.printStackTrace();
         }
 
-        IO trainWriter = new IO(project.toLowerCase() + File.separator + "Release_" + trainRelease.getReleaseNumber() + File.separator + "train");
-        IO testWriter = new IO(project.toLowerCase() + File.separator + "Release_" + trainRelease.getReleaseNumber() + File.separator + "test");
+        IO trainWriter = new IO(project.toLowerCase() + File.separator + "Release_" + (i+1) + File.separator + "train");
+        IO testWriter = new IO(project.toLowerCase() + File.separator + "Release_" + (i+1) + File.separator + "test");
 
         trainWriter.serializeDataSet(allClasses);
         testWriter.serializeDataSet(testRelease.getVersionClasses());

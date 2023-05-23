@@ -4,6 +4,6 @@ Rounded value of proportion computed with cold start is: 2
 ******************************************
 	  START ANALYZING BOOKKEEPER
 
-******************************************
-	  START ANALYZING OPENJPA
-
+Starting getting commits for project: bookkeeper...
+Obtained commits for project: bookkeeper
+Start computing software metrics ...

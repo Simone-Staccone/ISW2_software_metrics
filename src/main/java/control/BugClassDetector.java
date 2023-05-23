@@ -62,7 +62,7 @@ public class BugClassDetector {
 
     public static List<Releases> buildWalkForward(String project, Releases allReleases) {
         List<Releases> newReleases  = new ArrayList<>();
-        for(int i = 1;i<allReleases.getReleaseList().size()+1;i++){
+        for(int i = 0;i<allReleases.getReleaseList().size()+1;i++){
             JiraConnector jiraConnector = new JiraConnector();
             newReleases.add(jiraConnector.getInfos(project, String.valueOf(i)));
         }

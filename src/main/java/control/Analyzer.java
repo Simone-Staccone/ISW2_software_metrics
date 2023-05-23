@@ -29,10 +29,10 @@ public class Analyzer {
                     IO.appendOnLog("******************************************");
                     IO.appendOnLog("\t  START ANALYZING " + project + "\n");
                     Releases releases = jiraConnector.getInfos(project,"all");
-                    /*IO fileWriter = new IO(project);
+                    IO fileWriter = new IO(project);
                     List<RevCommit> commits = GitHubConnector.getCommits(project);
                     IO.appendOnLog("Start computing software metrics ...");
-
+/*
                     Analyzer.useCommits(releases,commits, proportion, project, fileWriter);
 
                     for(int i = 0; i < releases.getReleaseList().size(); i++){
@@ -43,8 +43,7 @@ public class Analyzer {
 
                     List<Releases> newReleases = BugClassDetector.buildWalkForward(project,releases);
 
-
-                    for(int i = 0;i<newReleases.size()/2 + 2 ;i++){
+                    for(int i = 0;i<newReleases.size() ;i++){
                         Analyzer.useCommits(newReleases.get(i), commits,proportion,project,fileWriter);
                         WalkForward.createFiles(newReleases.get(i),project,releases);
                         IO.appendOnLog("\nComputed training set for release " + i + "\n");
