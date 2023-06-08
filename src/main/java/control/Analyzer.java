@@ -32,7 +32,7 @@ public class Analyzer {
                     IO fileWriter = new IO(project);
                     List<RevCommit> commits = GitHubConnector.getCommits(project);
                     IO.appendOnLog("Start computing software metrics ...");
-/*
+
                     Analyzer.useCommits(releases,commits, proportion, project, fileWriter);
 
                     for(int i = 0; i < releases.getReleaseList().size(); i++){
@@ -50,7 +50,7 @@ public class Analyzer {
                     }
 
                     IO.appendOnLog("Walk forward applied successfully");
-*/
+
 
                     WekaApi.compute(project,releases);
 
