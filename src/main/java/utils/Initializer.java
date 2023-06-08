@@ -9,14 +9,14 @@ import java.util.*;
 
 
 public class Initializer {
-    private static List<String> PROJECT_NAMES = null;
-    private static String OUTPUT_FILE_NAME_TAIL = null;
-    private static String API_URL = null;
-    private static String SEARCH_URL_FIRST_HALF = null;
-    private static String SEARCH_URL_SECOND_HALF = null;
-    public static List<String> CATEGORIES = null;
+    private static List<String> projectNames = null;
+    private static String outputFileNameTail = null;
+    private static String apiUrl = null;
+    private static String searchUrlFirstHalf = null;
+    private static String searchUrlSecondHalf = null;
+    protected static List<String> categories = null;
     private static Initializer instance = null;
-    private static String LOG_FILE_NAME = null;
+    private static String logFileName = null;
 
     private Initializer() {}
 
@@ -29,27 +29,27 @@ public class Initializer {
     }
 
     public List<String> getProjectNames(){
-        return PROJECT_NAMES;
+        return projectNames;
     }
 
     public static String getApiUrl() {
-        return API_URL;
+        return apiUrl;
     }
 
     public static String getOutputFileNameTail() {
-        return OUTPUT_FILE_NAME_TAIL;
+        return outputFileNameTail;
     }
 
     public static String getSearchUrlFirstHalf() {
-        return SEARCH_URL_FIRST_HALF;
+        return searchUrlFirstHalf;
     }
 
     public static String getSearchUrlSecondHalf() {
-        return SEARCH_URL_SECOND_HALF;
+        return searchUrlSecondHalf;
     }
 
     public static String getLogFileName() {
-        return LOG_FILE_NAME;
+        return logFileName;
     }
 
     private void init() {
@@ -66,13 +66,13 @@ public class Initializer {
             JSONObject config = new JSONObject(myJson);
             JSONArray names = config.names();
 
-            API_URL = config.getString(names.getString(0));
-            CATEGORIES = convertJSONArrayListString(config,names.getString(1));
-            OUTPUT_FILE_NAME_TAIL = config.getString(names.getString(2));
-            SEARCH_URL_SECOND_HALF = config.getString(names.getString(3));
-            LOG_FILE_NAME = config.getString(names.getString(4));
-            SEARCH_URL_FIRST_HALF = config.getString(names.getString(5));
-            PROJECT_NAMES = convertJSONArrayListString(config,names.getString(6));
+            apiUrl = config.getString(names.getString(0));
+            categories = convertJSONArrayListString(config,names.getString(1));
+            outputFileNameTail = config.getString(names.getString(2));
+            searchUrlSecondHalf = config.getString(names.getString(3));
+            logFileName = config.getString(names.getString(4));
+            searchUrlFirstHalf = config.getString(names.getString(5));
+            projectNames = convertJSONArrayListString(config,names.getString(6));
 
 
         } catch (IOException e) {

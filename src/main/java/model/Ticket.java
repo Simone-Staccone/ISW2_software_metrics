@@ -3,41 +3,8 @@ package model;
 import java.util.Date;
 import java.util.Objects;
 
-public final class Ticket {
-    private final Date openingVersionDate;
-    private final Date fixedVersionDate;
-    private final Date injectedVersionDate;
-    private final String releaseName;
-    private final String key;
-
-    public Ticket(Date openingVersionDate, Date fixedVersionDate,
-           Date injectedVersionDate, String releaseName, String key) {
-        this.openingVersionDate = openingVersionDate;
-        this.fixedVersionDate = fixedVersionDate;
-        this.injectedVersionDate = injectedVersionDate;
-        this.releaseName = releaseName;
-        this.key = key;
-    }
-
-    public Date openingVersionDate() {
-        return openingVersionDate;
-    }
-
-    public Date fixedVersionDate() {
-        return fixedVersionDate;
-    }
-
-    public Date injectedVersionDate() {
-        return injectedVersionDate;
-    }
-
-    public String releaseName() {
-        return releaseName;
-    }
-
-    public String key() {
-        return key;
-    }
+public record Ticket(Date openingVersionDate, Date fixedVersionDate,
+                     Date injectedVersionDate, String releaseName, String key) {
 
     @Override
     public boolean equals(Object obj) {

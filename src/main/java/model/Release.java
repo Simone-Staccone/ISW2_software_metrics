@@ -7,13 +7,13 @@ import java.util.Date;
 import java.util.List;
 
 public class Release{
-    public int id;
-    public String name;
-    public Date releaseDate;
+    private int id;
+    private String name;
+    private final Date releaseDate;
     public final List<RevCommit> allCommits = new ArrayList<>();
-    public RevCommit lastCommit = null;
-    public int releaseNumber;
-    public List<ProjectClass> classes = new ArrayList<>();
+    private RevCommit lastCommit;
+    private final int releaseNumber;
+    private final List<ProjectClass> classes = new ArrayList<>();
 
 
     public Release(int id, String name, Date releaseDate, RevCommit lastCommit, int releaseNumber){

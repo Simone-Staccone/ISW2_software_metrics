@@ -45,45 +45,39 @@ public class Proportion {
         return (float) (fixedVersion-injectedVersion+1)/ (float) (fixedVersion-openingVersion+1); //Smoothing to consider the same version as distance one and therefore consider also tickets when IV = OV
     }
 
+
+
     public static Ticket createTicket(Date openingVersionDate, Date fixedVersionDate, JSONArray injectedVersion, List<Release> versions, String key) throws InvalidDataException {
-        Date OV = openingVersionDate;
-        String IV = injectedVersion.getJSONObject(0).getString("name");
-        Date IVDate = null;
-        Date FV = fixedVersionDate;
+        Date actualOpeningVersion = openingVersionDate;
+        String actualInjectedVersion = injectedVersion.getJSONObject(0).getString("name");
+        Date actualInjectedVersionDate = null;
+        Date actualFixedVersion = fixedVersionDate;
         boolean flagIV = false;
 
         for (int i = 1;i<versions.size()-1;i++) { //I don't consider first version as possible fixed version and last version as possible opening version (only resolved tickets)
             Date currentVersionDate = versions.get(i).getReleaseDate(); //Get the release date of a version
             if(openingVersionDate.before(currentVersionDate) && openingVersionDate.after(versions.get(i-1).getReleaseDate())){
-                OV = (versions.get(i).getReleaseDate());
+                actualOpeningVersion = (versions.get(i).getReleaseDate());
             }
             if(fixedVersionDate.after(currentVersionDate) && fixedVersionDate.before(versions.get(i+1).getReleaseDate())){
-                FV = (versions.get(i+1).getReleaseDate());
+                actualFixedVersion = (versions.get(i+1).getReleaseDate());
             }
-            if(!flagIV && IV.equals(versions.get(i).getName())){
-                IVDate = versions.get(i).getReleaseDate();
+            if(!flagIV && actualInjectedVersion.equals(versions.get(i).getName())){
+                actualInjectedVersionDate = versions.get(i).getReleaseDate();
                 flagIV = true;
             }
         }
 
-        if(IV.equals(versions.get(0).getName())){ //Check for injected version
-            IVDate = versions.get(0).getReleaseDate();
-        }else if(IV.equals(versions.get(versions.size()-1).getName())){
-            IVDate = versions.get(versions.size()-1).getReleaseDate();
+        if(actualInjectedVersion.equals(versions.get(0).getName())){ //Check for injected version
+            actualInjectedVersionDate = versions.get(0).getReleaseDate();
+        }else if(actualInjectedVersion.equals(versions.get(versions.size()-1).getName())){
+            actualInjectedVersionDate = versions.get(versions.size()-1).getReleaseDate();
         }
 
-        validateDate(fixedVersionDate,openingVersionDate,injectedVersion,OV,IV,IVDate,FV,versions);
-
-
-        return new Ticket(OV,FV,IVDate,IV,key);
-    }
-
-
-    private static void validateDate(Date fixedVersionDate, Date openingVersionDate, JSONArray injectedVersion, Date OV, String IV, Date IVDate, Date FV, List<Release> versions) throws InvalidDataException {
         if(fixedVersionDate.before(versions.get(versions.size()-1).getReleaseDate()) && versions.size() > 1 && fixedVersionDate.after(versions.get(versions.size()-2).getReleaseDate())){
-            FV = versions.get(versions.size()-1).getReleaseDate();
-        }else if(FV.compareTo(fixedVersionDate) == 0){
-            FV = versions.get(0).getReleaseDate();
+            actualFixedVersion = versions.get(versions.size()-1).getReleaseDate();
+        }else if(actualFixedVersion.compareTo(fixedVersionDate) == 0){
+            actualFixedVersion = versions.get(0).getReleaseDate();
         }
         if(fixedVersionDate.after(versions.get(versions.size()-1).getReleaseDate())){ //Do not consider if opening > last release date
             throw new InvalidDataException();
@@ -91,45 +85,49 @@ public class Proportion {
 
 
         if(openingVersionDate.before(versions.get(versions.size()-1).getReleaseDate()) && versions.size() > 1 && openingVersionDate.after(versions.get(versions.size()-2).getReleaseDate())){
-            OV = versions.get(versions.size()-1).getReleaseDate();
-        }else if(OV.compareTo(openingVersionDate) == 0){
-            OV = versions.get(0).getReleaseDate();
+            actualOpeningVersion = versions.get(versions.size()-1).getReleaseDate();
+        }else if(actualOpeningVersion.compareTo(openingVersionDate) == 0){
+            actualOpeningVersion = versions.get(0).getReleaseDate();
         }
         if(openingVersionDate.after(versions.get(versions.size()-1).getReleaseDate())){ //Do not consider if opening > last release date
             throw new InvalidDataException();
         }
 
-        if(IVDate == null || OV.after(FV) || IVDate.after(OV) || IVDate.after(FV)){ //Don't consider FV==OV to apply smoothing
+        if(actualInjectedVersionDate == null || actualOpeningVersion.after(actualFixedVersion) || actualInjectedVersionDate.after(actualOpeningVersion) || actualInjectedVersionDate.after(actualFixedVersion)){ //Don't consider FV==OV to apply smoothing
             throw new InvalidDataException();
         }
+
+        return new Ticket(actualOpeningVersion,actualFixedVersion,actualInjectedVersionDate,actualInjectedVersion,key);
     }
 
-    public static Ticket createTicketWithoutProportionAdmissible(Date openingVersionDate, Date fixedVersionDate, int proportionValue, List<Release> versions, String key) throws InvalidDataException {
-        Date OV = openingVersionDate;
-        int OVIndex = 0;
-        int FVIndex = 0;
-        Date IVDate;
-        Date FV = fixedVersionDate;
 
+
+
+    public static Ticket createTicketWithoutProportionAdmissible(Date openingVersionDate, Date fixedVersionDate, int proportionValue, List<Release> versions, String key) throws InvalidDataException {
+        Date actualOpeningVersion = openingVersionDate;
+        int actualOpeningVersionIndex = 0;
+        int actualFixedVersionIndex = 0;
+        Date actualInjectedVersionDate;
+        Date actualFixedVersion = fixedVersionDate;
 
         for (int i = 1;i<versions.size()-1;i++) { //I don't consider first version as possible fixed version and last version as possible opening version (only resolved tickets)
             Date currentVersionDate = versions.get(i).getReleaseDate(); //Get the release date of a version
             if(openingVersionDate.before(currentVersionDate) && openingVersionDate.after(versions.get(i-1).getReleaseDate())){
-                OV = (versions.get(i-1).getReleaseDate());
-                OVIndex = i-1;
+                actualOpeningVersion = (versions.get(i-1).getReleaseDate());
+                actualOpeningVersionIndex = i-1;
             }
             if(fixedVersionDate.after(currentVersionDate) && openingVersionDate.before(versions.get(i+1).getReleaseDate())){
-                FV = (versions.get(i+1).getReleaseDate());
-                FVIndex=i+1;
+                actualFixedVersion = (versions.get(i+1).getReleaseDate());
+                actualFixedVersionIndex=i+1;
             }
         }
 
 
         if(fixedVersionDate.before(versions.get(versions.size()-1).getReleaseDate()) && versions.size() > 1 && fixedVersionDate.after(versions.get(versions.size()-2).getReleaseDate())){
-            FV = versions.get(versions.size()-1).getReleaseDate();
-            FVIndex = versions.size()-1;
-        }else if(FV.compareTo(fixedVersionDate) == 0){
-            FV = versions.get(0).getReleaseDate();
+            actualFixedVersion = versions.get(versions.size()-1).getReleaseDate();
+            actualFixedVersionIndex = versions.size()-1;
+        }else if(actualFixedVersion.compareTo(fixedVersionDate) == 0){
+            actualFixedVersion = versions.get(0).getReleaseDate();
         }
         if(fixedVersionDate.after(versions.get(versions.size()-1).getReleaseDate())){ //Do not consider if opening > last release date
             throw new InvalidDataException();
@@ -137,45 +135,41 @@ public class Proportion {
 
 
         if(openingVersionDate.before(versions.get(versions.size()-1).getReleaseDate()) && versions.size() > 1 && openingVersionDate.after(versions.get(versions.size()-2).getReleaseDate())){
-            OV = versions.get(versions.size()-1).getReleaseDate();
-            OVIndex = versions.size()-1;
-        }else if(OV.compareTo(openingVersionDate) == 0){
-            OV = versions.get(0).getReleaseDate();
+            actualOpeningVersion = versions.get(versions.size()-1).getReleaseDate();
+            actualOpeningVersionIndex = versions.size()-1;
+        }else if(actualOpeningVersion.compareTo(openingVersionDate) == 0){
+            actualOpeningVersion = versions.get(0).getReleaseDate();
         }
         if(openingVersionDate.after(versions.get(versions.size()-1).getReleaseDate())){ //Do not consider if opening > last release date
             throw new InvalidDataException();
         }
 
-
+        int actualInjectedVersionIndex = actualFixedVersionIndex - (actualFixedVersionIndex - actualOpeningVersionIndex) * proportionValue;
 
         //Get injected version using proportion value
-
-        int IVIndex = FVIndex - (FVIndex - OVIndex) * proportionValue;
-
-        if(IVIndex < 1){
-            IVDate = versions.get(0).getReleaseDate();
-            IVIndex = 0;
-        }else if(IVIndex == FVIndex){
-            IVIndex = FVIndex - 1;
-            IVDate = versions.get(IVIndex).getReleaseDate();
+        if(actualInjectedVersionIndex < 1){
+            actualInjectedVersionDate = versions.get(0).getReleaseDate();
+            actualInjectedVersionIndex = 0;
+        }else if(actualInjectedVersionIndex == actualFixedVersionIndex){
+            actualInjectedVersionIndex = actualFixedVersionIndex - 1;
+            actualInjectedVersionDate = versions.get(actualInjectedVersionIndex).getReleaseDate();
         }else{
-            IVDate = versions.get(IVIndex).getReleaseDate();
+            actualInjectedVersionDate = versions.get(actualInjectedVersionIndex).getReleaseDate();
         }
 
 
-        if(FV.compareTo(fixedVersionDate) == 0){
-            FV = versions.get(0).getReleaseDate();
+        if(actualFixedVersion.compareTo(fixedVersionDate) == 0){
+            actualFixedVersion = versions.get(0).getReleaseDate();
         }
 
-        if(IVDate == null || OV.after(FV) || IVDate.after(OV) || IVDate.after(FV)){ //Don't consider FV==OV
-            if(versions.get(IVIndex-1).getReleaseDate().before(FV)){ //When releases aren't ordered by date
-                IVDate = versions.get(IVIndex-1).getReleaseDate();
-                IVIndex = IVIndex -1;
+        if(actualInjectedVersionDate == null || actualOpeningVersion.after(actualFixedVersion) || actualInjectedVersionDate.after(actualOpeningVersion) || actualInjectedVersionDate.after(actualFixedVersion)){ //Don't consider FV==OV
+            if(versions.get(actualInjectedVersionIndex-1).getReleaseDate().before(actualFixedVersion)){ //When releases aren't ordered by date
+                actualInjectedVersionDate = versions.get(actualInjectedVersionIndex-1).getReleaseDate();
+                actualInjectedVersionIndex = actualInjectedVersionIndex -1;
             }else{
                 throw new InvalidDataException();
             }
         }
-
-        return new Ticket(OV,FV,IVDate,versions.get(IVIndex).getName(),key);
+        return new Ticket(actualOpeningVersion,actualFixedVersion,actualInjectedVersionDate,versions.get(actualInjectedVersionIndex).getName(),key);
     }
 }

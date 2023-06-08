@@ -9,6 +9,8 @@ import java.util.Date;
 
 
 public class DateParser {
+    private DateParser(){}
+
     public static Date parseStringToDate(String date){
         try {
             return new SimpleDateFormat(ConstantNames.FORMATTING_STRING).parse(date);
@@ -24,7 +26,9 @@ public class DateParser {
             return 0;
         }
 
-        int index = 0, count = 0;
+        int index = 0;
+        int count = 0;
+
         while (true)
         {
             index = text.indexOf(str, index);

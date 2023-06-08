@@ -37,9 +37,9 @@ public class IO {
         IO.appendOnFile(this.datasetUrlString,"@data");
     }
 
-    public IO(String project, boolean csv) throws Exception {
+    public IO(String project, boolean csv) throws IOException {
         if(!csv){
-            throw new Exception();
+            throw new IOException();
         }
         this.datasetUrlString = "C:\\Users\\simon\\ISW2Projects\\Falessi\\src\\main\\data\\" + project + "\\WekaReport.csv";
         this.project = project;
@@ -52,7 +52,7 @@ public class IO {
     public static void createDirectory(String dir) throws IOException {
         File directory = new File(dir);
         if(!directory.exists()){
-            System.out.println(directory.mkdirs() + " " + dir);
+            throw new IOException();
         }
     }
 
@@ -64,7 +64,6 @@ public class IO {
         try (InputStream is = new URI(url).toURL().openStream()) {
             BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
             String jsonText = readAll(rd);
-            is.close();
             return new JSONObject(jsonText);
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
@@ -79,33 +78,6 @@ public class IO {
             sb.append((char) cp);
         }
         return sb.toString();
-    }
-
-    public boolean writeOnFile( List<List<String>> entries){
-        try{
-            String dir = "src" +  File.separator + "main" + File.separator + "data" + File.separator + project.toLowerCase() + File.separator;
-            File directory = new File(dir);
-            if(!directory.exists()){
-                if(!directory.mkdir()){
-                    throw new IOException();
-                }
-            }
-            FileWriter fileWriter = new FileWriter(dir + project + Initializer.getOutputFileNameTail());
-            fileWriter.append("Index;Version ID;Version Name;Date\n");
-            int index = 0;
-
-            for (List<String> ledge : entries) {
-                fileWriter.append(String.valueOf(index)).append(CSV_SEPARATOR).append(ledge.get(0)).append(CSV_SEPARATOR).append(ledge.get(1)).append(CSV_SEPARATOR)
-                        .append(ledge.get(2)).append("\n");
-                index++;
-            }
-            fileWriter.flush();
-            fileWriter.close();
-            return true;
-        } catch(IOException i){
-            i.printStackTrace();
-            return false;
-        }
     }
 
     public static void appendOnLog(String whatToWrite){
@@ -134,15 +106,15 @@ public class IO {
             fileWriter.close();
         } catch(IOException i){
             File directory = new File(dir);
-            if(!directory.exists()){
-                if(!directory.mkdir()) {
-                    i.printStackTrace();
-                }else {
-                    appendOnFile(dir,className);
-                }
+            if (!directory.exists() && !directory.mkdir()) {
+                i.printStackTrace();
+            } else {
+                appendOnFile(dir, className);
             }
         }
     }
+
+
 
     protected static void clean(String dir) {
         try{
