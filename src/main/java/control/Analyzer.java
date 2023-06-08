@@ -14,8 +14,8 @@ import java.util.Objects;
 public class Analyzer {
     private Analyzer(){}
 
+    //Get proportion as cold start for the projects which aren't bookkeeper and openjpa;
     public static int computeProportion(List<String> projects) {
-        //Get proportion as cold start for the projects which aren't bookkeeper and openjpa;
         JiraConnector jiraConnector = new JiraConnector();
         int roundedProportion = Math.round(jiraConnector.computeProportion(projects));
         IO.appendOnLog("Rounded value of proportion computed with cold start is: " + roundedProportion);

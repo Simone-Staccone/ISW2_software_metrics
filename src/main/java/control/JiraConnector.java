@@ -133,6 +133,7 @@ public class JiraConnector {
 					ticketList.add(Proportion.createTicketWithoutProportionAdmissible(openingVersionDate, fixedVersionDate, proportionValue, versions.getReleaseList(), key));
 				}
 			} catch (InvalidDataException ignored) {
+				//Discard non valid tickets
 			}
 
 

@@ -20,29 +20,29 @@ public class Proportion {
         for (Ticket ticket: ticketList){
             propSum = propSum + compute(ticket,releases);
         }
-      return propSum/ (float) ticketList.size();
+      return propSum/ ticketList.size();
     }
 
     private static float compute(Ticket ticket, Releases releases) {
-        int OV = 1;
-        int FV = 1;
-        int IV = 1;
+        int openingVersion = 1;
+        int fixedVersion = 1;
+        int injectedVersion = 1;
         int count = 1;
 
         for(Release release:releases.getReleaseList()){
             if(ticket.injectedVersionDate().compareTo(release.getReleaseDate()) == 0){
-                IV = count;
+                injectedVersion = count;
             }
             if(ticket.fixedVersionDate().compareTo(release.getReleaseDate()) == 0){
-                FV = count;
+                fixedVersion = count;
             }
             if(ticket.openingVersionDate().compareTo(release.getReleaseDate()) == 0){
-                OV = count;
+                openingVersion = count;
             }
             count++;
         }
 
-        return (float) (FV-IV+1)/ (float) (FV-OV+1); //Smoothing to consider the same version as distance one and therefore consider also tickets when IV = OV
+        return (float) (fixedVersion-injectedVersion+1)/ (float) (fixedVersion-openingVersion+1); //Smoothing to consider the same version as distance one and therefore consider also tickets when IV = OV
     }
 
     public static Ticket createTicket(Date openingVersionDate, Date fixedVersionDate, JSONArray injectedVersion, List<Release> versions, String key) throws InvalidDataException {
@@ -72,7 +72,14 @@ public class Proportion {
             IVDate = versions.get(versions.size()-1).getReleaseDate();
         }
 
+        validateDate(fixedVersionDate,openingVersionDate,injectedVersion,OV,IV,IVDate,FV,versions);
 
+
+        return new Ticket(OV,FV,IVDate,IV,key);
+    }
+
+
+    private static void validateDate(Date fixedVersionDate, Date openingVersionDate, JSONArray injectedVersion, Date OV, String IV, Date IVDate, Date FV, List<Release> versions) throws InvalidDataException {
         if(fixedVersionDate.before(versions.get(versions.size()-1).getReleaseDate()) && versions.size() > 1 && fixedVersionDate.after(versions.get(versions.size()-2).getReleaseDate())){
             FV = versions.get(versions.size()-1).getReleaseDate();
         }else if(FV.compareTo(fixedVersionDate) == 0){
@@ -95,8 +102,6 @@ public class Proportion {
         if(IVDate == null || OV.after(FV) || IVDate.after(OV) || IVDate.after(FV)){ //Don't consider FV==OV to apply smoothing
             throw new InvalidDataException();
         }
-
-        return new Ticket(OV,FV,IVDate,IV,key);
     }
 
     public static Ticket createTicketWithoutProportionAdmissible(Date openingVersionDate, Date fixedVersionDate, int proportionValue, List<Release> versions, String key) throws InvalidDataException {
