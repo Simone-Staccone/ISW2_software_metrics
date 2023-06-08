@@ -1,0 +1,15 @@
+@relation BOOKKEEPER
+@attribute LOC numeric
+@attribute LOC_ADDED numeric
+@attribute LOC_DELETED numeric
+@attribute N_AUTH numeric
+@attribute NR numeric
+@attribute MAX_LOC_ADDED numeric
+@attribute AVG_LOC_ADDED numeric
+@attribute CHURN numeric
+@attribute MAX_CHURN numeric
+@attribute AVG_CHURN numeric
+@attribute FAN_OUT numeric
+@attribute METHOD_COMPLEXITY numeric
+@attribute IS_BUGGY {'Yes', 'No'}
+@data
