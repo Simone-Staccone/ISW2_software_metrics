@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.List;
 
 public class BugClassDetector {
+    private BugClassDetector(){}
+
     public static void collectClassesWithBug(Releases releases, List<RevCommit> commits, String projectName, int proportionValue) throws IOException {
         JiraConnector jiraConnector = new JiraConnector();
         List<Ticket> ticketList = jiraConnector.getTickets(projectName,proportionValue,releases);
@@ -51,8 +53,7 @@ public class BugClassDetector {
         List<RevCommit> assCommits = new ArrayList<>();
 
         for (RevCommit commit : allCommits) {
-            if (!assCommits.contains(commit))
-                if (commit.getFullMessage().contains(ticket.key() + ":") || commit.getFullMessage().contains("[" + ticket.key()))
+            if( (!assCommits.contains(commit)) && (commit.getFullMessage().contains(ticket.key() + ":") || commit.getFullMessage().contains("[" + ticket.key())) )
                     assCommits.add(commit);
         }
 

@@ -39,7 +39,7 @@ public class GitHubConnector {
         RepositoryBuilder repositoryBuilder = new RepositoryBuilder();
 
         Repository repo = repositoryBuilder
-                .findGitDir(new File("C:\\Users\\simon\\ISW2Projects\\projects\\" + project.toLowerCase() + File.separator))
+                .findGitDir(new File(ConstantNames.ROOT_PATH + project.toLowerCase() + File.separator))
                 .setMustExist(true)
                 .build();
 
@@ -72,7 +72,7 @@ public class GitHubConnector {
     public static Map<String, String> getClassesForCommit(RevCommit commit, String project) throws IOException {
         RepositoryBuilder repositoryBuilder = new RepositoryBuilder();
         Repository repository = repositoryBuilder
-                .findGitDir(new File("C:\\Users\\simon\\ISW2Projects\\projects\\" + project.toLowerCase() + File.separator))
+                .findGitDir(new File(ConstantNames.ROOT_PATH + project.toLowerCase() + File.separator))
                 .setMustExist(true)
                 .build();
         Map<String, String> projectClasses = new HashMap<>();
@@ -96,7 +96,7 @@ public class GitHubConnector {
     }
 
     public static List<String> getModifiedClasses(RevCommit commit, String project) throws IOException {
-        FileRepository repository = new FileRepository("C:\\Users\\simon\\ISW2Projects\\projects\\" + project.toLowerCase() + File.separator + ".git");
+        FileRepository repository = new FileRepository(ConstantNames.ROOT_PATH + project.toLowerCase() + File.separator + ".git");
 
         List<String> modifiedClasses = new ArrayList<>();    //Here there will be the names of the classes that have been modified by the commit
 
@@ -158,7 +158,7 @@ public class GitHubConnector {
 
 
     public static void computeAddedAndDeletedLinesList(ProjectClass projectClass, String project) throws IOException {
-        FileRepository repo = new FileRepository("C:\\Users\\simon\\ISW2Projects\\projects\\" + project.toLowerCase() + File.separator + ".git");
+        FileRepository repo = new FileRepository(ConstantNames.ROOT_PATH + project.toLowerCase() + File.separator + ".git");
         int sumLocAdded = 0;
         int sumLocDel = 0;
 
@@ -200,19 +200,23 @@ public class GitHubConnector {
             for (Release release : releases.getReleaseList()) {
                 for (RevCommit commit : release.allCommits) {
                     List<String> classNamesList = GitHubConnector.getModifiedClasses(commit, projectName);
-                    for (String className : classNamesList) {
-                        for (ProjectClass projectClass : release.getVersionClasses()) {
-                            if (projectClass.getName().compareTo(className) == 0) {
-                                projectClass.addCommit(commit);
-                            }
-                        }
-                    }
+                        iterateOverClasses(classNamesList,commit,release);
                 }
 
             }
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static void iterateOverClasses(List<String> classNamesList, RevCommit commit, Release release){
+        for (String className : classNamesList) {
+            for (ProjectClass projectClass : release.getVersionClasses()) {
+                if (projectClass.getName().compareTo(className) == 0) {
+                    projectClass.addCommit(commit);
+                }
+            }
         }
     }
 
@@ -228,18 +232,22 @@ public class GitHubConnector {
                     releases.getReleaseList().get(0).setLastCommit(commit);
                 }
             }
+            iterateOverReleases(releases,commit);
 
-            for (int i = 1; i < releases.getReleaseList().size(); i++) {
-                if (releases.getReleaseList().get(i).getLastCommit() == null && commit.getAuthorIdent().getWhen().before(releases.getReleaseList().get(i).getReleaseDate())) {
+        }
+    }
+
+    private static void iterateOverReleases(Releases releases, RevCommit commit){
+        for (int i = 1; i < releases.getReleaseList().size(); i++) {
+            if (releases.getReleaseList().get(i).getLastCommit() == null && commit.getAuthorIdent().getWhen().before(releases.getReleaseList().get(i).getReleaseDate())) {
+                releases.getReleaseList().get(i).setLastCommit(commit);
+            }
+
+            if ( ( commit.getAuthorIdent().getWhen().before(releases.getReleaseList().get(i).getReleaseDate()) && commit.getAuthorIdent().getWhen().after(releases.getReleaseList().get(i - 1).getReleaseDate()) )
+                    || commit.getAuthorIdent().getWhen().compareTo(releases.getReleaseList().get(i).getReleaseDate()) == 0) {
+                releases.getReleaseList().get(i).addCommit(commit);
+                if (commit.getAuthorIdent().getWhen().after(releases.getReleaseList().get(i).getLastCommit().getAuthorIdent().getWhen())) {
                     releases.getReleaseList().get(i).setLastCommit(commit);
-                }
-
-                if ( ( commit.getAuthorIdent().getWhen().before(releases.getReleaseList().get(i).getReleaseDate()) && commit.getAuthorIdent().getWhen().after(releases.getReleaseList().get(i - 1).getReleaseDate()) )
-                 || commit.getAuthorIdent().getWhen().compareTo(releases.getReleaseList().get(i).getReleaseDate()) == 0) {
-                    releases.getReleaseList().get(i).addCommit(commit);
-                    if (commit.getAuthorIdent().getWhen().after(releases.getReleaseList().get(i).getLastCommit().getAuthorIdent().getWhen())) {
-                        releases.getReleaseList().get(i).setLastCommit(commit);
-                    }
                 }
             }
         }

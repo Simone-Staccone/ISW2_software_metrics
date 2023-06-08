@@ -19,8 +19,8 @@ import java.util.Objects;
 public class JiraConnector {
 	private static List<List<String>> getVersionInfo(JSONArray versions, int num){
 		List<List<String>> entries = new ArrayList<>();
-		int len = Math.min(num, versions.length());//num<versions.length() ? num : versions.length();
-		for (int i = 0; i < len; i++ ) { //I take only half of the versions
+		int len = Math.min(num, versions.length());
+		for (int i = 0; i < len; i++ ) {
 			List<String> entry = new ArrayList<>();
 			if(versions.getJSONObject(i).has("releaseDate") && versions.getJSONObject(i).has("name") && versions.getJSONObject(i).has("id") && versions.getJSONObject(i).getBoolean("released")) { //Considering releases only with date, name and id
 				entry.add(versions.getJSONObject(i).get("id").toString());
@@ -39,8 +39,6 @@ public class JiraConnector {
 
 		int i = 1;
 		for (String project : projects) {
-			System.out.println(project.toUpperCase());
-			//List<Ticket> allAVTickets = new ArrayList<>();
 			float singleProportion;
 			if (!Objects.equals(project, "BOOKKEEPER") && !Objects.equals(project, "OPENJPA")) {
 				Releases versions = getInfos(project, "all");
@@ -55,8 +53,6 @@ public class JiraConnector {
 
 		}
 
-
-
 		IO.appendOnLog("Proportion value computed with cold start is: " + prop / 5);
 		IO.appendOnLog("Proportion successfully acquired\n");
 
@@ -64,32 +60,35 @@ public class JiraConnector {
 	}
 
 	public Releases getInfos(String projectName, String number) {
-		JSONObject resultSet = IO.readJsonObject(Initializer.getApiUrl() + projectName); //Get the JSON result from the url to see all the issues
+		//Get the JSON result from the url to see all the issues
+		JSONObject resultSet = IO.readJsonObject(Initializer.getApiUrl() + projectName);
 		assert resultSet != null;
-		int num = resultSet.getJSONArray("versions").length();
+		int num = resultSet.getJSONArray(ConstantNames.VERSIONS).length();
 		if(number.compareTo("all") != 0){
 			num = Integer.parseInt(number);
 		}
 
-		return new Releases(getVersionInfo(resultSet.getJSONArray("versions") , num+1));
+		return new Releases(getVersionInfo(resultSet.getJSONArray(ConstantNames.VERSIONS) , num+1));
 	}
 
 
 
 	private static List<Ticket> getTicketsWithAv(String project, Releases versions){
+		//Get the JSON result from the url to see all the issues
 		JSONObject secondResultSet = IO.readJsonObject(Initializer.getSearchUrlFirstHalf()
 				+ project
-				+ Initializer.getSearchUrlSecondHalf()); //Get the JSON result from the url to see all the issues
+				+ Initializer.getSearchUrlSecondHalf());
 		List<Ticket> ticketList = new ArrayList<>();
 
-		for (int i = 0; i< Objects.requireNonNull(secondResultSet).getJSONArray("issues").length(); i++) {
-			JSONObject fields = secondResultSet.getJSONArray("issues").getJSONObject(i).getJSONObject("fields");
-			String key = secondResultSet.getJSONArray("issues").getJSONObject(i).getString("key");
+		for (int i = 0; i< Objects.requireNonNull(secondResultSet).getJSONArray(ConstantNames.ISSUES).length(); i++) {
+			JSONObject fields = secondResultSet.getJSONArray(ConstantNames.ISSUES).getJSONObject(i).getJSONObject("fields");
+			String key = secondResultSet.getJSONArray(ConstantNames.ISSUES).getJSONObject(i).getString("key");
 
-			if(fields.getJSONArray("versions").length() != 0){ //Check only tickets with injected version
+			//Check only tickets with injected version
+			if(fields.getJSONArray(ConstantNames.VERSIONS).length() != 0){
 				Date openingVersionDate = DateParser.parseStringToDate(fields.getString("created").substring(0,ConstantNames.FORMATTING_STRING.length())); //While parsing, I intentionally lose information about hour and minutes of the ticket
 				Date fixedVersionDate = DateParser.parseStringToDate(fields.getString("resolutiondate").substring(0,ConstantNames.FORMATTING_STRING.length()));
-				JSONArray injectedVersions = fields.getJSONArray("versions");
+				JSONArray injectedVersions = fields.getJSONArray(ConstantNames.VERSIONS);
 
 
 				assert openingVersionDate != null;
@@ -98,6 +97,7 @@ public class JiraConnector {
 				try {
 					ticketList.add(Proportion.createTicket(openingVersionDate,fixedVersionDate,injectedVersions,versions.getReleaseList(),key));
 				} catch (InvalidDataException ignored) {
+					//We want to discard invalid tickets
 				}
 			}
 		}
@@ -107,15 +107,16 @@ public class JiraConnector {
 	}
 
 	public List<Ticket> getTickets(String projectName, int proportionValue, Releases versions) {
+		//Get the JSON result from the url to see all the issues
 		JSONObject secondResultSet = IO.readJsonObject(Initializer.getSearchUrlFirstHalf()
 				+ projectName
-				+ Initializer.getSearchUrlSecondHalf()); //Get the JSON result from the url to see all the issues
+				+ Initializer.getSearchUrlSecondHalf());
 		List<Ticket> ticketList = new ArrayList<>();
 
 
-		for (int i = 0; i < Objects.requireNonNull(secondResultSet).getJSONArray("issues").length(); i++) {
-			JSONObject fields = secondResultSet.getJSONArray("issues").getJSONObject(i).getJSONObject("fields");
-			String key = secondResultSet.getJSONArray("issues").getJSONObject(i).getString("key");
+		for (int i = 0; i < Objects.requireNonNull(secondResultSet).getJSONArray(ConstantNames.ISSUES).length(); i++) {
+			JSONObject fields = secondResultSet.getJSONArray(ConstantNames.ISSUES).getJSONObject(i).getJSONObject("fields");
+			String key = secondResultSet.getJSONArray(ConstantNames.ISSUES).getJSONObject(i).getString("key");
 			Date openingVersionDate = DateParser.parseStringToDate(fields.getString("created").substring(0, ConstantNames.FORMATTING_STRING.length())); //While parsing, I intentionally lose information about hour and minutes of the ticket
 			Date fixedVersionDate = DateParser.parseStringToDate(fields.getString("resolutiondate").substring(0, ConstantNames.FORMATTING_STRING.length()));
 
@@ -123,9 +124,10 @@ public class JiraConnector {
 			assert fixedVersionDate != null;
 
 			try {
-				if (fields.getJSONArray("versions").length() != 0) { //Check only tickets with injected version
+				//Check only tickets with injected version
+				if (fields.getJSONArray(ConstantNames.VERSIONS).length() != 0) {
 
-					JSONArray injectedVersions = fields.getJSONArray("versions");
+					JSONArray injectedVersions = fields.getJSONArray(ConstantNames.VERSIONS);
 					ticketList.add(Proportion.createTicket(openingVersionDate, fixedVersionDate, injectedVersions, versions.getReleaseList(), key));
 				} else {
 					ticketList.add(Proportion.createTicketWithoutProportionAdmissible(openingVersionDate, fixedVersionDate, proportionValue, versions.getReleaseList(), key));

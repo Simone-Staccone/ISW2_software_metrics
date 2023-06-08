@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ComputeMetrics {
-    public ComputeMetrics(){
+    private ComputeMetrics(){
 
     }
 

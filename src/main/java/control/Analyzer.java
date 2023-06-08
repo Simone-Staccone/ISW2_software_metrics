@@ -12,11 +12,14 @@ import java.util.Map;
 import java.util.Objects;
 
 public class Analyzer {
+    private Analyzer(){}
+
     public static int computeProportion(List<String> projects) {
+        //Get proportion as cold start for the projects which aren't bookkeeper and openjpa;
         JiraConnector jiraConnector = new JiraConnector();
         int roundedProportion = Math.round(jiraConnector.computeProportion(projects));
         IO.appendOnLog("Rounded value of proportion computed with cold start is: " + roundedProportion);
-        return roundedProportion; //Get proportion as cold start for the projects which aren't bookkeeper and openjpa;
+        return roundedProportion;
     }
 
     public static void analyzeProjects(List<String> projects, int proportion) {
@@ -72,8 +75,8 @@ public class Analyzer {
         for (int i = 0; i < releases.getReleaseList().size(); i++) {
             Map<String, String> versionClasses = GitHubConnector.getClassesForCommit(releases.getReleaseList().get(i).getLastCommit(), project);
 
-            for (String className : versionClasses.keySet()) {
-                ProjectClass projectClass = new ProjectClass(i, className, versionClasses.get(className));
+            for (Map.Entry<String, String> className : versionClasses.entrySet()) {
+                ProjectClass projectClass = new ProjectClass(i, className.getKey(), versionClasses.get(className.getKey()));
                 releases.getReleaseList().get(i).addProjectClass(projectClass);
                 GitHubConnector.setFanOut(projectClass);
                 GitHubConnector.setMethodsNumber(projectClass);

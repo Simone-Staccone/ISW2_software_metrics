@@ -1,4 +1,5 @@
-import control.Analyzer;
+package control;
+
 import org.json.JSONException;
 import utils.IO;
 import utils.Initializer;
