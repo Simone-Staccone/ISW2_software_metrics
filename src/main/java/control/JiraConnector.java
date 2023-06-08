@@ -34,9 +34,7 @@ public class JiraConnector {
 	}
 
 	public float computeProportion(List<String> projects) {
-		//List<Float> proportions = new ArrayList<>();
 		float prop = 0;
-		int totalSize = 0;
 		IO.appendOnLog("Computing proportion with cold start ...");
 
 		int i = 1;
@@ -48,15 +46,9 @@ public class JiraConnector {
 				Releases versions = getInfos(project, "all");
 				List<Ticket> ticketList;
 				ticketList = JiraConnector.getTicketsWithAv(project,versions);
-
-				/*allAVTickets = Stream.concat(allAVTickets.stream(), ticketList.stream())
-						.distinct()
-						.collect(Collectors.toList());*/
 				singleProportion = Proportion.coldStart(ticketList, versions); //Compute proportion for each project
-				prop = prop + singleProportion;//*allAVTickets.size();  //Weighted avarege
-				//proportions.add(singleProportion);
+				prop = prop + singleProportion;
 
-				//totalSize = totalSize + allAVTickets.size();
 				IO.appendOnLog("Proportion computed for project " + project + " is: " + singleProportion + " number of tickets: " + ticketList.size());
 				i++;
 			}

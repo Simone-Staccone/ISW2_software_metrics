@@ -27,22 +27,16 @@ public class WekaApi {
         IO fileWriter = new IO(projectName,true);
 
         for(int i = 0;i<releases.getReleaseList().size();i++){
-            System.out.println("\nITERATION " + i + "\n");
-
 
             String trainUrl = "src" + File.separator + "main" + File.separator + "data" + File.separator + projectName.toLowerCase() + File.separator + "Release_" + (i+1) + File.separator + "train";
             String testUrl = "src" + File.separator + "main" + File.separator + "data" + File.separator + projectName.toLowerCase() + File.separator + "Release_" + (i+1) + File.separator + "test";
 
-            System.out.println(trainUrl);
-            System.out.println(testUrl);
 
             DataSource trainSource = new DataSource(trainUrl  + File.separator + "DataSet.arff");
             DataSource testSource = new DataSource(testUrl + File.separator +  "DataSet.arff");
 
             Instances trainData = trainSource.getDataSet();
             Instances testData = testSource.getDataSet();
-
-            System.out.println("Testing size: " + testData.size());
 
             trainData.setClassIndex(trainData.numAttributes() - 1);
             testData.setClassIndex(trainData.numAttributes() - 1);
@@ -53,9 +47,6 @@ public class WekaApi {
             ibkClassifier(i,trainData,testData,eval,fileWriter);
             eval = new Evaluation(trainData);
             randomForestClassifier(i,trainData,testData,eval,fileWriter);
-
-
-            System.out.println("\nFEATURE SELECTION\n");
 
             AttributeSelection filter = new AttributeSelection();
             CfsSubsetEval cfsSubsetEval = new CfsSubsetEval();
@@ -80,9 +71,6 @@ public class WekaApi {
             eval = new Evaluation(filteredTrainingData);
             randomForestClassifier(i,filteredTrainingData,filteredTestingData,eval,fileWriter);
 
-
-            System.out.println("\nUNDER SAMPLING AFTER FEATURE SELECTION\n");
-
             Filter resampleUnder = new Resample();
             resampleUnder.setOptions(Utils.splitOptions("-B 1.0 -Z 130.3")); //options for under-sampling
             resampleUnder.setInputFormat(filteredTrainingData);
@@ -98,8 +86,6 @@ public class WekaApi {
             ibkClassifier(i,filteredTrainingDataU,filteredTestingDataU,eval,fileWriter);
             eval = new Evaluation(filteredTrainingDataU);
             randomForestClassifier(i,filteredTrainingDataU,filteredTestingDataU,eval,fileWriter);
-
-            System.out.println("\nOVER SAMPLING AFTER FEATURE SELECTION\n");
 
             SpreadSubsample resampleOver = new SpreadSubsample ();
             resampleOver.setOptions(Utils.splitOptions("-M 1.0")); //options for over-sampling
@@ -118,9 +104,7 @@ public class WekaApi {
             randomForestClassifier(i,filteredTrainingDataO,filteredTestingDataO,eval,fileWriter);
 
 
-            System.out.println("\nSMOTE AFTER FEATURE SELECTION\n");
-
-            /*SMOT*/
+            /*SMOTE*/
             SMOTE smote = new SMOTE();
             smote.setInputFormat(filteredTrainingData);
             Instances smoteTrainingData = Filter.useFilter(filteredTrainingData, smote);
@@ -142,8 +126,6 @@ public class WekaApi {
 
         // evaluation
         eval.evaluateModel(randomForest, testData);
-        System.out.println(Arrays.deepToString(eval.confusionMatrix()));
-        System.out.println( eval.precision(0) + " " + eval.recall(0) + " " + eval.areaUnderROC(0) + " " + eval.kappa());
         fileWriter.serializeDataSetOnCsv(i,"Random Forest",eval.precision(0),eval.recall(0),eval.areaUnderROC(0),eval.kappa());
     }
 
@@ -153,8 +135,6 @@ public class WekaApi {
 
         // evaluation
         eval.evaluateModel(naiveBayes, test);
-        System.out.println(Arrays.deepToString(eval.confusionMatrix()));
-        System.out.println( eval.precision(0) + " " + eval.recall(0) + " " + eval.areaUnderROC(0) + " " + eval.kappa());
         fileWriter.serializeDataSetOnCsv(i,"Naive Bayess",eval.precision(0),eval.recall(0),eval.areaUnderROC(0),eval.kappa());
     }
 
@@ -172,8 +152,6 @@ public class WekaApi {
 
         // evaluation
         eval.evaluateModel(iBk, test);
-        System.out.println(Arrays.deepToString(eval.confusionMatrix()));
-        System.out.println( eval.precision(0) + " " + eval.recall(0) + " " + eval.areaUnderROC(0) + " " + eval.kappa());
         fileWriter.serializeDataSetOnCsv(i,"IBK",eval.precision(0),eval.recall(0),eval.areaUnderROC(0),eval.kappa());
     }
 

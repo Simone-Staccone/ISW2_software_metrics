@@ -1,7 +1,6 @@
 package control;
 
 import model.ProjectClass;
-import model.Release;
 import model.Releases;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -15,7 +14,7 @@ import java.util.Objects;
 public class Analyzer {
     public static int computeProportion(List<String> projects) {
         JiraConnector jiraConnector = new JiraConnector();
-        int roundedProportion = 2;//Math.round(jiraConnector.computeProportion(projects));
+        int roundedProportion = Math.round(jiraConnector.computeProportion(projects));
         IO.appendOnLog("Rounded value of proportion computed with cold start is: " + roundedProportion);
         return roundedProportion; //Get proportion as cold start for the projects which aren't bookkeeper and openjpa;
     }

@@ -30,16 +30,9 @@ public class WalkForward {
 
 
 
-        Release trainRelease = newReleases.getReleaseList().get(newReleases.getReleaseList().size()-1);
+
         Release testRelease = releases.getReleaseList().get(newReleases.getReleaseList().size());
 
-
-        int j = 0;
-        for(ProjectClass projectClass:testRelease.getVersionClasses()){
-            if(projectClass.isBug())
-                j++;
-        };
-        System.out.println(j);
 
         String trainUrl = "src" + File.separator + "main" + File.separator + "data" + File.separator + project.toLowerCase() + File.separator + "Release_" + (i+1) + File.separator + "train";
         String testUrl = "src" + File.separator + "main" + File.separator + "data" + File.separator + project.toLowerCase() + File.separator + "Release_" + (i+1) + File.separator + "test";
