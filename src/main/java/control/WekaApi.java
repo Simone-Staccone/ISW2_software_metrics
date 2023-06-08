@@ -11,9 +11,11 @@ import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 import weka.core.Utils;
 import weka.core.converters.ConverterUtils.DataSource;
-import weka.filters.supervised.instance.*;
+import weka.filters.supervised.instance.Resample;
 import weka.filters.Filter;
 import weka.filters.supervised.attribute.AttributeSelection;
+import weka.filters.supervised.instance.SMOTE;
+import weka.filters.supervised.instance.SpreadSubsample;
 
 import java.io.File;
 import java.util.Arrays;
@@ -46,15 +48,10 @@ public class WekaApi {
             testData.setClassIndex(trainData.numAttributes() - 1);
 
             Evaluation eval = new Evaluation(trainData);
-
-            ibkClassifier(i,trainData,testData,eval,fileWriter);
-
-            eval = new Evaluation(trainData);
-
             NBClassification(i,trainData, testData, eval,fileWriter);
-
             eval = new Evaluation(trainData);
-
+            ibkClassifier(i,trainData,testData,eval,fileWriter);
+            eval = new Evaluation(trainData);
             randomForestClassifier(i,trainData,testData,eval,fileWriter);
 
 
@@ -65,7 +62,7 @@ public class WekaApi {
 
 
             BestFirst bestFirst = new BestFirst();
-            bestFirst.setOptions(Utils.splitOptions("-D -1")); //-1 backward, 0 bidirectional, 1 forward
+            bestFirst.setOptions(Utils.splitOptions("-D 0")); //0 backward, 2 bidirectional, 1 forward
             filter.setEvaluator(cfsSubsetEval);
             filter.setSearch(bestFirst);
             filter.setInputFormat(trainData);
@@ -87,8 +84,7 @@ public class WekaApi {
             System.out.println("\nUNDER SAMPLING AFTER FEATURE SELECTION\n");
 
             Filter resampleUnder = new Resample();
-            resampleUnder.setOptions(Utils.splitOptions("-B 1.0 -Z 69.8 -no-replacement")); //options for under-sampling
-            //resample.setOptions(Utils.splitOptions("-M 1.0")); //options for over-sampling
+            resampleUnder.setOptions(Utils.splitOptions("-B 1.0 -Z 130.3")); //options for under-sampling
             resampleUnder.setInputFormat(filteredTrainingData);
 
             Instances filteredTrainingDataU = Filter.useFilter(filteredTrainingData, resampleUnder);
@@ -105,7 +101,7 @@ public class WekaApi {
 
             System.out.println("\nOVER SAMPLING AFTER FEATURE SELECTION\n");
 
-            Filter resampleOver = new Resample();
+            SpreadSubsample resampleOver = new SpreadSubsample ();
             resampleOver.setOptions(Utils.splitOptions("-M 1.0")); //options for over-sampling
             resampleOver.setInputFormat(filteredTrainingData);
 
@@ -124,11 +120,18 @@ public class WekaApi {
 
             System.out.println("\nSMOTE AFTER FEATURE SELECTION\n");
 
-            /*SMOT TODO*/
-            resampleOver.setInputFormat(filteredTrainingData);
+            /*SMOT*/
+            SMOTE smote = new SMOTE();
+            smote.setInputFormat(filteredTrainingData);
+            Instances smoteTrainingData = Filter.useFilter(filteredTrainingData, smote);
+            Instances smoteTestingData = Filter.useFilter(filteredTestingData, smote);
 
-
-
+            eval = new Evaluation(smoteTrainingData);
+            NBClassification(i,smoteTrainingData, smoteTestingData, eval,fileWriter);
+            eval = new Evaluation(smoteTrainingData);
+            ibkClassifier(i,smoteTrainingData,smoteTestingData,eval,fileWriter);
+            eval = new Evaluation(smoteTrainingData);
+            randomForestClassifier(i,smoteTrainingData,smoteTestingData,eval,fileWriter);
         }
 
     }
