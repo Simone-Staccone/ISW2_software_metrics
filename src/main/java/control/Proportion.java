@@ -170,15 +170,17 @@ public class Proportion {
         int actualInjectedVersionIndex = actualFixedVersionIndex - (actualFixedVersionIndex - actualOpeningVersionIndex) * proportionValue;
 
         //Get injected version using proportion value
+        actualInjectedVersionDate = versions.get(actualInjectedVersionIndex).getReleaseDate();
+
         if(actualInjectedVersionIndex < 1){
             actualInjectedVersionDate = versions.get(0).getReleaseDate();
             actualInjectedVersionIndex = 0;
         }else if(actualInjectedVersionIndex == actualFixedVersionIndex){
             actualInjectedVersionIndex = actualFixedVersionIndex - 1;
             actualInjectedVersionDate = versions.get(actualInjectedVersionIndex).getReleaseDate();
-        }else{
-            actualInjectedVersionDate = versions.get(actualInjectedVersionIndex).getReleaseDate();
         }
+
+
 
 
         actualFixedVersion = checkActualFIxedVersion(actualFixedVersion,fixedVersionDate,versions);
