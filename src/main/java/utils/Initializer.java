@@ -9,14 +9,14 @@ import java.util.*;
 
 
 public class Initializer {
-    private static List<String> projectNames = null;
-    private static String outputFileNameTail = null;
-    private static String apiUrl = null;
-    private static String searchUrlFirstHalf = null;
-    private static String searchUrlSecondHalf = null;
-    protected static List<String> categories = null;
+    private  List<String> projectNames = null;
+    private  String outputFileNameTail = null;
+    private  String apiUrl = null;
+    private  String searchUrlFirstHalf = null;
+    private  String searchUrlSecondHalf = null;
+    protected  List<String> categories = null;
     private static Initializer instance = null;
-    private static String logFileName = null;
+    private  String logFileName = null;
 
     private Initializer() {}
 
@@ -32,23 +32,23 @@ public class Initializer {
         return projectNames;
     }
 
-    public static String getApiUrl() {
+    public String getApiUrl() {
         return apiUrl;
     }
 
-    public static String getOutputFileNameTail() {
-        return outputFileNameTail;
+    public String getOutputFileNameTail() {
+        return this.outputFileNameTail;
     }
 
-    public static String getSearchUrlFirstHalf() {
+    public  String getSearchUrlFirstHalf() {
         return searchUrlFirstHalf;
     }
 
-    public static String getSearchUrlSecondHalf() {
+    public  String getSearchUrlSecondHalf() {
         return searchUrlSecondHalf;
     }
 
-    public static String getLogFileName() {
+    public  String getLogFileName() {
         return logFileName;
     }
 

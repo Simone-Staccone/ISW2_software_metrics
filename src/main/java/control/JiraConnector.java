@@ -61,7 +61,8 @@ public class JiraConnector {
 
 	public Releases getInfos(String projectName, String number) {
 		//Get the JSON result from the url to see all the issues
-		JSONObject resultSet = IO.readJsonObject(Initializer.getApiUrl() + projectName);
+		Initializer initializer = Initializer.getInstance();
+		JSONObject resultSet = IO.readJsonObject(initializer.getApiUrl() + projectName);
 		assert resultSet != null;
 		int num = resultSet.getJSONArray(ConstantNames.VERSIONS).length();
 		if(number.compareTo("all") != 0){
@@ -75,9 +76,10 @@ public class JiraConnector {
 
 	private static List<Ticket> getTicketsWithAv(String project, Releases versions){
 		//Get the JSON result from the url to see all the issues
-		JSONObject secondResultSet = IO.readJsonObject(Initializer.getSearchUrlFirstHalf()
+		Initializer initializer = Initializer.getInstance();
+		JSONObject secondResultSet = IO.readJsonObject(initializer.getSearchUrlFirstHalf()
 				+ project
-				+ Initializer.getSearchUrlSecondHalf());
+				+ initializer.getSearchUrlSecondHalf());
 		List<Ticket> ticketList = new ArrayList<>();
 
 		for (int i = 0; i< Objects.requireNonNull(secondResultSet).getJSONArray(ConstantNames.ISSUES).length(); i++) {
@@ -108,9 +110,10 @@ public class JiraConnector {
 
 	public List<Ticket> getTickets(String projectName, int proportionValue, Releases versions) {
 		//Get the JSON result from the url to see all the issues
-		JSONObject secondResultSet = IO.readJsonObject(Initializer.getSearchUrlFirstHalf()
+		Initializer initializer = Initializer.getInstance();
+		JSONObject secondResultSet = IO.readJsonObject(initializer.getSearchUrlFirstHalf()
 				+ projectName
-				+ Initializer.getSearchUrlSecondHalf());
+				+ initializer.getSearchUrlSecondHalf());
 		List<Ticket> ticketList = new ArrayList<>();
 
 

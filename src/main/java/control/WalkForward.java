@@ -34,8 +34,8 @@ public class WalkForward {
         Release testRelease = releases.getReleaseList().get(newReleases.getReleaseList().size());
 
 
-        String trainUrl = "src" + File.separator + "main" + File.separator + "data" + File.separator + project.toLowerCase() + File.separator + "Release_" + (i+1) + File.separator + "train";
-        String testUrl = "src" + File.separator + "main" + File.separator + "data" + File.separator + project.toLowerCase() + File.separator + "Release_" + (i+1) + File.separator + "test";
+        String trainUrl = "src" + File.separator + "main" + File.separator + "data" + File.separator + project.toLowerCase() + File.separator + ConstantNames.RELEASE + (i+1) + File.separator + "train";
+        String testUrl = "src" + File.separator + "main" + File.separator + "data" + File.separator + project.toLowerCase() + File.separator + ConstantNames.RELEASE + (i+1) + File.separator + "test";
 
         try {
             IO.createDirectory(trainUrl);
@@ -44,8 +44,8 @@ public class WalkForward {
             e.printStackTrace();
         }
 
-        IO trainWriter = new IO(project.toLowerCase() + File.separator + "Release_" + (i+1) + File.separator + "train");
-        IO testWriter = new IO(project.toLowerCase() + File.separator + "Release_" + (i+1) + File.separator + "test");
+        IO trainWriter = new IO(project.toLowerCase() + File.separator + ConstantNames.RELEASE + (i+1) + File.separator + "train");
+        IO testWriter = new IO(project.toLowerCase() + File.separator + ConstantNames.RELEASE + (i+1) + File.separator + "test");
 
         trainWriter.serializeDataSet(allClasses);
         testWriter.serializeDataSet(testRelease.getVersionClasses());

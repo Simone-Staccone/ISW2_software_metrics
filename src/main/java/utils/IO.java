@@ -11,7 +11,6 @@ import java.util.List;
 
 
 public class IO {
-    private static final String CSV_SEPARATOR = ",";
     private static final String CSV_SEPARATOR_2 = ";";
     private final String datasetUrlString;
     private final String project;
@@ -81,7 +80,8 @@ public class IO {
     }
 
     public static void appendOnLog(String whatToWrite){
-        String dir = "src" +  File.separator + "main" + File.separator + Initializer.getLogFileName();
+        Initializer initializer = Initializer.getInstance();
+        String dir = "src" +  File.separator + "main" + File.separator + initializer.getLogFileName();
         appendOnFile(dir,whatToWrite);
     }
 

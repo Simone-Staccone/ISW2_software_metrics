@@ -67,7 +67,7 @@ public class Proportion {
                 flagIV = true;
             }
         }
-        
+
 
         actualInjectedVersionDate = getActualInjectedVersion(actualInjectedVersion,versions,actualInjectedVersionDate);
 
@@ -155,9 +155,8 @@ public class Proportion {
         }else if(actualFixedVersion.compareTo(fixedVersionDate) == 0){
             actualFixedVersion = versions.get(0).getReleaseDate();
         }
-        if(fixedVersionDate.after(versions.get(versions.size()-1).getReleaseDate())){ //Do not consider if opening > last release date
-            throw new InvalidDataException();
-        }
+
+
 
 
         if(openingVersionDate.before(versions.get(versions.size()-1).getReleaseDate()) && versions.size() > 1 && openingVersionDate.after(versions.get(versions.size()-2).getReleaseDate())){
@@ -166,9 +165,7 @@ public class Proportion {
         }else if(actualOpeningVersion.compareTo(openingVersionDate) == 0){
             actualOpeningVersion = versions.get(0).getReleaseDate();
         }
-        if(openingVersionDate.after(versions.get(versions.size()-1).getReleaseDate())){ //Do not consider if opening > last release date
-            throw new InvalidDataException();
-        }
+
 
         int actualInjectedVersionIndex = actualFixedVersionIndex - (actualFixedVersionIndex - actualOpeningVersionIndex) * proportionValue;
 
@@ -184,18 +181,41 @@ public class Proportion {
         }
 
 
+        actualFixedVersion = checkActualFIxedVersion(actualFixedVersion,fixedVersionDate,versions);
+
+
+
+        actualInjectedVersionDate = checkConsistencyWithoutProportion(fixedVersionDate,openingVersionDate,actualInjectedVersionDate,actualOpeningVersion,actualFixedVersion,versions,actualInjectedVersionIndex );
+
+        actualInjectedVersionIndex = actualInjectedVersionIndex -1;
+
+        return new Ticket(actualOpeningVersion,actualFixedVersion,actualInjectedVersionDate,versions.get(actualInjectedVersionIndex).getName(),key);
+    }
+
+    private static Date checkActualFIxedVersion(Date actualFixedVersion, Date fixedVersionDate, List<Release> versions) {
         if(actualFixedVersion.compareTo(fixedVersionDate) == 0){
-            actualFixedVersion = versions.get(0).getReleaseDate();
+            return versions.get(0).getReleaseDate();
+        }
+        return actualFixedVersion;
+    }
+
+
+    private static Date checkConsistencyWithoutProportion(Date fixedVersionDate, Date openingVersionDate, Date actualInjectedVersionDate, Date actualOpeningVersion, Date actualFixedVersion, List<Release> versions, int actualInjectedVersionIndex) throws InvalidDataException {
+        if(openingVersionDate.after(versions.get(versions.size()-1).getReleaseDate())){ //Do not consider if opening > last release date
+            throw new InvalidDataException();
+        }
+        if(fixedVersionDate.after(versions.get(versions.size()-1).getReleaseDate())){ //Do not consider if opening > last release date
+            throw new InvalidDataException();
         }
 
         if(actualInjectedVersionDate == null || actualOpeningVersion.after(actualFixedVersion) || actualInjectedVersionDate.after(actualOpeningVersion) || actualInjectedVersionDate.after(actualFixedVersion)){ //Don't consider FV==OV
             if(versions.get(actualInjectedVersionIndex-1).getReleaseDate().before(actualFixedVersion)){ //When releases aren't ordered by date
-                actualInjectedVersionDate = versions.get(actualInjectedVersionIndex-1).getReleaseDate();
-                actualInjectedVersionIndex = actualInjectedVersionIndex -1;
+                return versions.get(actualInjectedVersionIndex-1).getReleaseDate();
             }else{
                 throw new InvalidDataException();
             }
         }
-        return new Ticket(actualOpeningVersion,actualFixedVersion,actualInjectedVersionDate,versions.get(actualInjectedVersionIndex).getName(),key);
+        return null;
     }
+
 }
