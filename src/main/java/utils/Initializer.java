@@ -55,14 +55,17 @@ public class Initializer {
     private void init() {
         String path = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "config" + File.separator + "config.json";
         IO.clean();
-
-
-        try {
-            File file = new File(path);
-            if (!file.exists()){
-                    throw new IOException("Impossible to find configuration file file");
+        File file = new File(path);
+        if (!file.exists()){
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            String myJson = new Scanner(file).useDelimiter("\\Z").next();
+        }
+
+        try(Scanner scanner = new Scanner(file)) {
+            String myJson = scanner.useDelimiter("\\Z").next();
             JSONObject config = new JSONObject(myJson);
             JSONArray names = config.names();
 

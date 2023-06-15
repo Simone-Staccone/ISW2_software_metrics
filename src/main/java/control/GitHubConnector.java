@@ -128,6 +128,8 @@ public class GitHubConnector {
         } catch (ArrayIndexOutOfBoundsException e) {
             //commit has no parents: skip this commit, return an empty list and go on
 
+        }finally {
+            repository.close();
         }
 
         return modifiedClasses;

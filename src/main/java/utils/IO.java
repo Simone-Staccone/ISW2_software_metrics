@@ -87,23 +87,19 @@ public class IO {
 
 
     public static void clean() {
-        try{
-            String dir = "src" +  File.separator + "main" + File.separator + "log.txt";
-            FileWriter fileWriter = new FileWriter(dir);
+        String dir = "src" +  File.separator + "main" + File.separator + "log.txt";
+        try(FileWriter fileWriter = new FileWriter(dir)){
             fileWriter.append("");
             fileWriter.flush();
-            fileWriter.close();
         } catch(IOException i){
             i.printStackTrace();
         }
     }
 
     public static void appendOnFile(String dir, String className) {
-        try{
-            FileWriter fileWriter = new FileWriter(dir,true);
+        try(FileWriter fileWriter = new FileWriter(dir,true)){
             fileWriter.append(className).append("\n");
             fileWriter.flush();
-            fileWriter.close();
         } catch(IOException i){
             File directory = new File(dir);
             if (!directory.exists() && !directory.mkdir()) {
@@ -117,11 +113,9 @@ public class IO {
 
 
     protected static void clean(String dir) {
-        try{
-            FileWriter fileWriter = new FileWriter(dir);
+        try(FileWriter fileWriter = new FileWriter(dir)){
             fileWriter.append("");
             fileWriter.flush();
-            fileWriter.close();
         } catch(IOException i){
             i.printStackTrace();
         }
