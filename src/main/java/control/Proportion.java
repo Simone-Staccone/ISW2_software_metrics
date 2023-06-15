@@ -67,28 +67,56 @@ public class Proportion {
                 flagIV = true;
             }
         }
+        
 
+        actualInjectedVersionDate = getActualInjectedVersion(actualInjectedVersion,versions,actualInjectedVersionDate);
+
+        actualFixedVersion = getActualFixedVersion(fixedVersionDate,versions,actualFixedVersion);
+
+        actualOpeningVersion = getActualOpeningVersion(openingVersionDate,versions,actualOpeningVersion);
+
+        consistencyCheck(fixedVersionDate,openingVersionDate,versions,actualInjectedVersionDate,actualOpeningVersion,actualFixedVersion);
+
+
+
+        return new Ticket(actualOpeningVersion,actualFixedVersion,actualInjectedVersionDate,actualInjectedVersion,key);
+    }
+
+    private static Date getActualInjectedVersion(String actualInjectedVersion, List<Release> versions, Date actualInjectedVersionDate) {
         if(actualInjectedVersion.equals(versions.get(0).getName())){ //Check for injected version
-            actualInjectedVersionDate = versions.get(0).getReleaseDate();
+            return versions.get(0).getReleaseDate();
         }else if(actualInjectedVersion.equals(versions.get(versions.size()-1).getName())){
-            actualInjectedVersionDate = versions.get(versions.size()-1).getReleaseDate();
+            return  versions.get(versions.size()-1).getReleaseDate();
         }
+        return actualInjectedVersionDate;
+    }
 
+
+    private static Date getActualFixedVersion(Date fixedVersionDate, List<Release> versions, Date actualFixedVersion) {
         if(fixedVersionDate.before(versions.get(versions.size()-1).getReleaseDate()) && versions.size() > 1 && fixedVersionDate.after(versions.get(versions.size()-2).getReleaseDate())){
-            actualFixedVersion = versions.get(versions.size()-1).getReleaseDate();
+            return  versions.get(versions.size()-1).getReleaseDate();
         }else if(actualFixedVersion.compareTo(fixedVersionDate) == 0){
-            actualFixedVersion = versions.get(0).getReleaseDate();
+            return  versions.get(0).getReleaseDate();
         }
+        return actualFixedVersion;
+    }
+
+    private static Date getActualOpeningVersion(Date openingVersionDate, List<Release> versions, Date actualOpeningVersion) {
+        if(openingVersionDate.before(versions.get(versions.size()-1).getReleaseDate()) && versions.size() > 1 && openingVersionDate.after(versions.get(versions.size()-2).getReleaseDate())){
+            return versions.get(versions.size()-1).getReleaseDate();
+        }else if(actualOpeningVersion.compareTo(openingVersionDate) == 0){
+            return versions.get(0).getReleaseDate();
+        }
+        return actualOpeningVersion;
+    }
+
+
+    private static void consistencyCheck(Date fixedVersionDate, Date openingVersionDate, List<Release> versions, Date actualInjectedVersionDate, Date actualOpeningVersion, Date actualFixedVersion) throws InvalidDataException {
         if(fixedVersionDate.after(versions.get(versions.size()-1).getReleaseDate())){ //Do not consider if opening > last release date
             throw new InvalidDataException();
         }
 
 
-        if(openingVersionDate.before(versions.get(versions.size()-1).getReleaseDate()) && versions.size() > 1 && openingVersionDate.after(versions.get(versions.size()-2).getReleaseDate())){
-            actualOpeningVersion = versions.get(versions.size()-1).getReleaseDate();
-        }else if(actualOpeningVersion.compareTo(openingVersionDate) == 0){
-            actualOpeningVersion = versions.get(0).getReleaseDate();
-        }
         if(openingVersionDate.after(versions.get(versions.size()-1).getReleaseDate())){ //Do not consider if opening > last release date
             throw new InvalidDataException();
         }
@@ -96,8 +124,6 @@ public class Proportion {
         if(actualInjectedVersionDate == null || actualOpeningVersion.after(actualFixedVersion) || actualInjectedVersionDate.after(actualOpeningVersion) || actualInjectedVersionDate.after(actualFixedVersion)){ //Don't consider FV==OV to apply smoothing
             throw new InvalidDataException();
         }
-
-        return new Ticket(actualOpeningVersion,actualFixedVersion,actualInjectedVersionDate,actualInjectedVersion,key);
     }
 
 
