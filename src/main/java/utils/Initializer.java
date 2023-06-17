@@ -62,7 +62,7 @@ public class Initializer {
                 if(!newFile)
                     throw new IOException();
             } catch (IOException e) {
-                e.printStackTrace();
+                System.exit(-1);
             }
         }
 
