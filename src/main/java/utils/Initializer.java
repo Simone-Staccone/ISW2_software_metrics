@@ -58,7 +58,9 @@ public class Initializer {
         File file = new File(path);
         if (!file.exists()){
             try {
-                file.createNewFile();
+                boolean newFile = file.createNewFile();
+                if(!newFile)
+                    throw new IOException();
             } catch (IOException e) {
                 e.printStackTrace();
             }

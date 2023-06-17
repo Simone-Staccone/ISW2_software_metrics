@@ -310,7 +310,7 @@ Random Forest;20;0,625;0,094339623;0,743871985;0,148144849;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Plain;iteration;precision;recall;RC;kappa;;Feature Selection;iteration;precision;recall;RC;kappa;;;Under Sampling;iteration;precision;recall;RC;kappa;;Over Sampling;iteration;precision;recall;RC;kappa;;;SMOTE;iteration;precision;recall;RC;kappa
+Plain;iteration;precision;recall;AUC;kappa;;Feature Selection;iteration;precision;recall;AUC;kappa;;;Under Sampling;iteration;precision;recall;AUC;kappa;;Over Sampling;iteration;precision;recall;AUC;kappa;;;SMOTE;iteration;precision;recall;AUC;kappa
 Naive Bayess;1;NaN;0;0,283113991;0;;Naive Bayess;1;NaN;0;0,63115003;0;;;Naive Bayess;1;NaN;0;0,638023891;0;;Naive Bayess;1;NaN;0;0,629641628;0;;;Naive Bayess;1;NaN;0;0,629641628;0
 Naive Bayess;2;0,178571429;0,108695652;0,75354251;0,105004057;;Naive Bayess;2;0,189189189;0,152173913;0,757712111;0,134339586;;;Naive Bayess;2;0,226415094;0,260869565;0,749636948;0,204533798;;Naive Bayess;2;0,24;0,260869565;0,75666696;0,213555311;;;Naive Bayess;2;0,195121951;0,173913043;0,75465367;0,148191122
 Naive Bayess;3;0,178571429;0,102040816;0,788330717;0,099687765;;Naive Bayess;3;0,170731707;0,142857143;0,783349434;0,118535329;;;Naive Bayess;3;0,211538462;0,224489796;0,780209717;0,178845571;;Naive Bayess;3;0,220338983;0,265306122;0,774222115;0,200473299;;;Naive Bayess;3;0,2;0,183673469;0,782051282;0,15415864
@@ -336,7 +336,7 @@ Naive Bayess;20;0,456140351;0,245283019;0,839341788;0,283612144;;Naive Bayess;20
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Plain;iteration;precision;recall;RC;kappa;;Feature Selection;iteration;precision;recall;RC;kappa;;;Under Sampling;iteration;precision;recall;RC;kappa;;Over Sampling;;;;;;;;SMOTE;iteration;precision;recall;RC;kappa
+Plain;iteration;precision;recall;AUC;kappa;;Feature Selection;iteration;precision;recall;AUC;kappa;;;Under Sampling;iteration;precision;recall;AUC;kappa;;Over Sampling;;;;AUC;;;;SMOTE;iteration;precision;recall;AUC;kappa
 IBK;1;NaN;0;0,502227171;0;;IBK;1;NaN;0;0,779307552;0;;;IBK;1;NaN;0;0,728133225;0;;IBK;1;NaN;0;0,779307552;0;;;IBK;1;NaN;0;0,792792063;0
 IBK;2;0,222222222;0,086956522;0,637508801;0,102541847;;IBK;2;0,176470588;0,065217391;0,631413924;0,07298122;;;IBK;2;0,133333333;0,086956522;0,56256601;0,072694661;;IBK;2;0,096551724;0,608695652;0,683440415;0,097348664;;;IBK;2;0,166666667;0,065217391;0,630929854;0,070489771
 IBK;3;0,4;0,040816327;0,750140885;0,066102052;;IBK;3;0;0;0,732570543;-0,010159476;;;IBK;3;0,1875;0,06122449;0,62367669;0,071230767;;IBK;3;0,093959732;0,571428571;0,657086503;0,089278301;;;IBK;3;0;0;0,731866119;-0,013108833
@@ -364,7 +364,7 @@ IBK;20;0,431818182;0,179245283;0,787850897;0,221039356;;IBK;20;0,4;0,188679245;0
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Plain;iteration;precision;recall;RC;kappa;;Feature Selection;iteration;precision;recall;RC;kappa;;;Under Sampling;iteration;precision;recall;RC;kappa;;Over Sampling;iteration;precision;recall;RC;kappa;;;SMOTE;iteration;precision;recall;RC;kappa
+Plain;iteration;precision;recall;AUC;kappa;;Feature Selection;iteration;precision;recall;AUC;kappa;;;Under Sampling;iteration;precision;recall;AUC;kappa;;Over Sampling;iteration;precision;recall;AUC;kappa;;;SMOTE;iteration;precision;recall;AUC;kappa
 Random Forest;1;NaN;0;0,5;0;;Random Forest;1;NaN;0;0,5;0;;;Random Forest;1;NaN;0;0,5;0;;Random Forest;1;NaN;0;0,5;0;;;Random Forest;1;NaN;0;0,5;0
 Random Forest;2;0,5;0,02173913;0,685453705;0,038100631;;Random Forest;2;0,5;0,02173913;0,693858916;0,038100631;;;Random Forest;2;0,083333333;0,02173913;0,679820894;0,01637562;;Random Forest;2;0,116731518;0,652173913;0,775919732;0,132556325;;;Random Forest;2;0,25;0,02173913;0,67527724;0,033117743
 Random Forest;3;1;0,020408163;0,6575796;0,038226646;;Random Forest;3;NaN;0;0,649146641;0;;;Random Forest;3;0,3;0,06122449;0,705752123;0,087435412;;Random Forest;3;0,115942029;0,489795918;0,758171316;0,122052716;;;Random Forest;3;1;0,040816327;0,674848046;0,075087472
@@ -385,15 +385,3 @@ Random Forest;17;0,625;0,075757576;0,72979798;0,115797497;;Random Forest;17;0,58
 Random Forest;18;0;0;0,78493919;-0,004051375;;Random Forest;18;0,5;0,028368794;0,746118167;0,043747205;;;Random Forest;18;0,260869565;0,127659574;0,754677345;0,115116206;;Random Forest;18;0,25308642;0,581560284;0,783900979;0,251704025;;;Random Forest;18;0,666666667;0,042553191;0,765509802;0,069183089
 Random Forest;19;0,4;0,034782609;0,765802797;0,052288862;;Random Forest;19;0,444444444;0,034782609;0,733969369;0,053909271;;;Random Forest;19;0,21978022;0,173913043;0,747496994;0,135162559;;Random Forest;19;0,225255973;0,573913043;0,808844377;0,239127456;;;Random Forest;19;0,444444444;0,069565217;0,767663439;0,101517816
 Random Forest;20;0,545454545;0,056603774;0,737845483;0,09047861;;Random Forest;20;0,7;0,066037736;0,729013833;0,109844077;;;Random Forest;20;0,219047619;0,216981132;0,751600525;0,158849918;;Random Forest;20;0,240282686;0,641509434;0,792307328;0,275077172;;;Random Forest;20;0,625;0,094339623;0,743871985;0,148144849
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
